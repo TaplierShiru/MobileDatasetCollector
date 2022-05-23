@@ -1,11 +1,17 @@
 import 'dart:convert';
-
-import 'package:app/environment/environment.dart';
+import 'package:app/auth/pages/login/login.dart';
+import 'package:app/auth/pages/registration/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:app/environment/environment.dart';
+import 'package:provider/provider.dart';
+
+import 'auth/view_model/auth_view_model.dart';
+
 Future<String> testServer(http.Client client) async {
-  final response = await client.get(Uri.parse(Environment.apiUrl + '/auth'));
+  final response =
+      await client.get(Uri.parse(Environment.appendToApiUrl(['auth'])));
 
   if (response.statusCode == 200) {
     return jsonDecode(response.body)['message'];
@@ -14,7 +20,14 @@ Future<String> testServer(http.Client client) async {
 }
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,62 +41,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LoginWidget(),
+        '/auth': (context) => const LoginWidget(),
+        '/auth/registration': (context) => const RegistrationWidget()
+      },
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  late Future<String> serverTest;
-
-  @override
-  void initState() {
-    super.initState();
-    serverTest = getMessage(http.Client());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              children: [
-                const Text('Is server acceptable?'),
-                FutureBuilder<String>(
-                  future: serverTest,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return const Icon(Icons.add);
-                    } else if (snapshot.hasError) {
-                      const Icon(Icons.close);
-                    }
-                    return const CircularProgressIndicator();
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<String> getMessage(http.Client client) async {
-    return await testServer(client);
   }
 }
