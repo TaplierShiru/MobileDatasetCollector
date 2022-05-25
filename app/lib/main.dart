@@ -1,13 +1,11 @@
 import 'dart:convert';
-import 'package:app/auth/pages/login/login.dart';
-import 'package:app/auth/pages/registration/registration.dart';
+import 'package:app/core/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:app/environment/environment.dart';
 import 'package:provider/provider.dart';
-
-import 'auth/view_model/auth_view_model.dart';
+import 'user/view_model/user_view_model.dart';
 
 Future<String> testServer(http.Client client) async {
   final response =
@@ -22,9 +20,7 @@ Future<String> testServer(http.Client client) async {
 void main() {
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AuthViewModel()),
-      ],
+      providers: [ChangeNotifierProvider(create: (context) => UserViewModel())],
       child: const MyApp(),
     ),
   );
@@ -38,15 +34,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const LoginWidget(),
-        '/auth': (context) => const LoginWidget(),
-        '/auth/registration': (context) => const RegistrationWidget()
-      },
+      theme: ThemeData(primaryColor: Colors.blue, errorColor: Colors.red),
+      initialRoute: AppRoute.routes[RouteEnum.initialRoute],
+      routes: AppRoute.getRoutesToWidget(context),
+      onGenerateRoute: AppRoute.generateRoute,
     );
   }
 }
