@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../auth/pages/login/login.dart';
 import '../../auth/pages/registration/registration.dart';
+import '../../folders/pages/user_folders/user_folders.dart';
+import '../../user/pages/settings/settings_page.dart';
 import '../pages/error_page/error_page.dart';
 import '../pages/main_page/main_page.dart';
 
@@ -38,9 +40,9 @@ extension AppRoute on RouteEnum {
       AppRoute.routes[RouteEnum.homePageRoute]!: (context) =>
           const MainPageWidget(),
       AppRoute.routes[RouteEnum.myFoldersRoute]!: (context) =>
-          const MainPageWidget(),
+          const UserFoldersWidget(),
       AppRoute.routes[RouteEnum.settingsRoute]!: (context) =>
-          const MainPageWidget(),
+          const SettingsPage(),
     };
   }
 

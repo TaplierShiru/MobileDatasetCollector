@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
-class SettingsPage extends StatefulWidget {
+import 'change_user_info_widget.dart';
+import 'change_user_password_widget.dart';
+
+class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: const Center(
-        child: Text('settings page!'),
+      appBar: AppBar(
+        title: const Text('Registration Page'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: const <Widget>[
+            ChangeUserInfoWidget(),
+            ChangePasswordUserWidget()
+          ],
+        ),
       ),
     );
   }

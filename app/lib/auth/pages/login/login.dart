@@ -1,9 +1,12 @@
 import 'package:app/core/routes/routes.dart';
+import 'package:app/core/utils/status_code_enum.dart';
 import 'package:app/user/view_model/user_view_model.dart';
 import 'package:app/utils/validators/required_validator.dart';
 import 'package:app/utils/widgets/async_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../utils/exceptions/request_exception.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({Key? key}) : super(key: key);
@@ -90,19 +93,23 @@ class _LoginWidgetState extends State<LoginWidget> {
         if (_formKey.currentState!.validate()) {
           String usernameOrEmail = userNameController.text;
           String password = passwordController.text;
-          bool result = await Provider.of<UserViewModel>(context, listen: false)
-              .login(usernameOrEmail, password);
-          if (!mounted) return false;
-          if (result) {
+          try {
+            await Provider.of<UserViewModel>(context, listen: false)
+                .login(usernameOrEmail, password);
+
+            if (!mounted) return false;
             ScaffoldMessenger.of(context)
                 .showSnackBar(const SnackBar(content: Text('Login success')));
             Navigator.pushNamed(
                 context, AppRoute.routes[RouteEnum.homePageRoute]!);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Wrong username/email or password')));
+
+            return true;
+          } on RequestException catch (e) {
+            if (e.requestDto.statusCode == StatusCode.unauthorized) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Wrong username/email or password')));
+            }
           }
-          return result;
         }
         return false;
       },

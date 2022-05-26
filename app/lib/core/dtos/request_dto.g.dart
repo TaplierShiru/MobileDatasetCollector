@@ -17,5 +17,6 @@ Map<String, dynamic> _$RequestDtoToJson(RequestDto instance) =>
 
 const _$StatusCodeEnumMap = {
   StatusCode.success: 200,
+  StatusCode.unauthorized: 401,
   StatusCode.wrongEntity: 500,
 };

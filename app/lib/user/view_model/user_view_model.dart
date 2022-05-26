@@ -18,9 +18,8 @@ class UserViewModel extends ChangeNotifier {
     _userService.currentUser = userDto;
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<void> login(String email, String password) async {
     setCurrentUser = await _authService.login(email, password);
-    return getCurrentUser != null;
   }
 
   Future<RequestDto> register(CreateUserDto createUserDto) {
