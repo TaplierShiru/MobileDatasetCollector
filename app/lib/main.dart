@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app/core/routes/routes.dart';
+import 'package:app/folders/view_model/folders_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,7 +21,10 @@ Future<String> testServer(http.Client client) async {
 void main() {
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context) => UserViewModel())],
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserViewModel()),
+        ChangeNotifierProvider(create: (context) => FoldersViewModel())
+      ],
       child: const MyApp(),
     ),
   );

@@ -13,7 +13,8 @@ enum RouteEnum {
   authRoute,
   registrationRoute,
   homePageRoute,
-  myFoldersRoute,
+  foldersRoute,
+  singleFolderRoute,
   settingsRoute,
   logoutRoute
 }
@@ -24,7 +25,9 @@ extension AppRoute on RouteEnum {
     RouteEnum.authRoute: '/auth',
     RouteEnum.registrationRoute: '/auth/registration',
     RouteEnum.homePageRoute: '/home-page',
-    RouteEnum.myFoldersRoute: '/my-folders',
+    // Single folder - /folders/:id
+    RouteEnum.foldersRoute: '/folders',
+    RouteEnum.singleFolderRoute: '/folders/id',
     RouteEnum.settingsRoute: '/settings',
     RouteEnum.logoutRoute: '/logout'
   };
@@ -39,8 +42,8 @@ extension AppRoute on RouteEnum {
           const RegistrationWidget(),
       AppRoute.routes[RouteEnum.homePageRoute]!: (context) =>
           const MainPageWidget(),
-      AppRoute.routes[RouteEnum.myFoldersRoute]!: (context) =>
-          const UserFoldersWidget(),
+      AppRoute.routes[RouteEnum.foldersRoute]!: (context) =>
+          const MainPageWidget(),
       AppRoute.routes[RouteEnum.settingsRoute]!: (context) =>
           const SettingsPage(),
     };
@@ -50,6 +53,12 @@ extension AppRoute on RouteEnum {
     var uri = Uri.parse(settings.name!);
     if (uri.path == AppRoute.routes[RouteEnum.logoutRoute]) {
       return MaterialPageRoute(builder: (_) => const LoginWidget());
+    }
+    if (uri.path == AppRoute.routes[RouteEnum.singleFolderRoute]) {
+      return MaterialPageRoute(
+        builder: (_) =>
+            UserFoldersWidget(folderId: settings.arguments as String),
+      );
     }
     return MaterialPageRoute(builder: (_) => const ErrorPage());
   }

@@ -1,4 +1,4 @@
-import 'package:app/user/dtos/user_dto.dart';
+import 'dart:io';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'folder_element_update_dto.g.dart';
@@ -11,20 +11,10 @@ class FolderElementUpdateDto {
   @JsonKey(required: true)
   late String label;
 
-  @JsonKey(required: true)
-  late String imageUrl;
+  @JsonKey()
+  late String imageFile;
 
-  @JsonKey(required: true)
-  late DateTime dateUploaded;
-
-  @JsonKey(required: true)
-  late DateTime dateChanged;
-
-  @JsonKey(required: true)
-  late UserDto lastUserChange;
-
-  FolderElementUpdateDto(this.name, this.label, this.imageUrl,
-      this.dateUploaded, this.dateChanged, this.lastUserChange);
+  FolderElementUpdateDto(this.name, this.label, this.imageFile);
 
   factory FolderElementUpdateDto.fromJson(Map<String, dynamic> json) =>
       _$FolderElementUpdateDtoFromJson(json);

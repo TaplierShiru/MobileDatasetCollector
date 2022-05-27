@@ -15,7 +15,7 @@ class DrawerMenuWidget extends StatelessWidget {
           drawerListTile(
               context, 'Home page', Icons.home, RouteEnum.homePageRoute),
           drawerListTile(
-              context, 'My folders', Icons.folder, RouteEnum.myFoldersRoute),
+              context, 'My folders', Icons.folder, RouteEnum.foldersRoute),
           drawerListTile(
               context, 'Settings', Icons.settings, RouteEnum.settingsRoute),
           drawerListTile(
