@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../validators/type_helpers.dart';
+
 enum AsyncButtonState { init, submitting, completed, error }
 
 // https://flutterdart.dk/flutter-data-from-child-to-parent/
@@ -9,12 +11,14 @@ enum AsyncButtonState { init, submitting, completed, error }
 typedef AsyncCall = Future<bool> Function();
 
 class AsyncButton extends StatefulWidget {
-  const AsyncButton({
-    Key? key,
-    required this.onAsyncCall,
-    required this.initButtonChild,
-  }) : super(key: key);
+  const AsyncButton(
+      {Key? key,
+      required this.onAsyncCall,
+      required this.initButtonChild,
+      this.isFloatingButton = false})
+      : super(key: key);
 
+  final bool isFloatingButton;
   final AsyncCall onAsyncCall;
   final Widget initButtonChild;
 
@@ -45,11 +49,17 @@ class _AsyncButtonState extends State<AsyncButton> {
 
   Widget circularContainer(bool done, bool error) {
     final color = done ? Colors.green : Colors.blue;
+    late Widget contChild;
+    if (widget.isFloatingButton) {
+      contChild = containerState(done, error);
+    } else {
+      contChild = Center(
+        child: containerState(done, error),
+      );
+    }
     return Container(
       decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      child: Center(
-        child: containerState(done, error),
-      ),
+      child: contChild,
     );
   }
 
@@ -68,25 +78,41 @@ class _AsyncButtonState extends State<AsyncButton> {
   Widget initButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(shape: const StadiumBorder()),
-        onPressed: () async {
-          updateState(AsyncButtonState.submitting);
-          await widget.onAsyncCall().then(
-            (value) {
-              if (value) {
-                updateState(AsyncButtonState.completed);
-              } else {
-                updateState(AsyncButtonState.error);
-              }
-              Timer(const Duration(seconds: 1), () {
-                updateState(AsyncButtonState.init);
-              });
-            },
-          );
-        },
+      child: widget.isFloatingButton ? floatingButton() : elevatedButton(),
+    );
+  }
+
+  Widget elevatedButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(shape: const StadiumBorder()),
+      onPressed: buttonOnPressed,
+      child: widget.initButtonChild,
+    );
+  }
+
+  Widget floatingButton() {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: FloatingActionButton(
+        onPressed: buttonOnPressed,
         child: widget.initButtonChild,
       ),
+    );
+  }
+
+  Future<void> buttonOnPressed() async {
+    updateState(AsyncButtonState.submitting);
+    await widget.onAsyncCall().then(
+      (value) {
+        if (value) {
+          updateState(AsyncButtonState.completed);
+        } else {
+          updateState(AsyncButtonState.error);
+        }
+        Timer(const Duration(seconds: 1), () {
+          updateState(AsyncButtonState.init);
+        });
+      },
     );
   }
 

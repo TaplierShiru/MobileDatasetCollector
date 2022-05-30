@@ -119,7 +119,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           if (!mounted) return false;
           if (result.statusCode == StatusCode.success) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Succefuly registered'),
+              content: Text('Successfully registered'),
             ));
             Future.delayed(const Duration(seconds: 1), () {
               Navigator.pop(context);

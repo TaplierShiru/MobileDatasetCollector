@@ -18,6 +18,9 @@ Future<String> testServer(http.Client client) async {
   throw Exception('Failed to test server');
 }
 
+// Image picker
+// https://pub.dev/packages/image_picker
+
 void main() {
   runApp(
     MultiProvider(

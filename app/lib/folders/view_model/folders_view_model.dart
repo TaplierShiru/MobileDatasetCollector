@@ -12,8 +12,21 @@ class FoldersViewModel extends ChangeNotifier {
     return _folderService.getFolders(filterParametersDto);
   }
 
-  Future<List<FolderElementDto>> getElementFolder(
-      FilterParametersDto filterParametersDto) {
-    return _folderService.getElementFolder(filterParametersDto);
+  Future<List<FolderElementDto>> getElementsFolder(
+      String id, FilterParametersDto filterParametersDto) {
+    return _folderService.getElementsFolder(id, filterParametersDto);
+  }
+
+  Future<FolderElementDto> getElementFolder(String parentId, String id) {
+    return _folderService.getElementFolder(parentId, id);
+  }
+
+  Future<void> createFolder(FolderDto folderDto) async {
+    await _folderService.createFolder(folderDto);
+    notifyListeners();
+  }
+
+  Future<List<String>> getLabelsOfFolder(String id) async {
+    return _folderService.getLabelsOfFolder(id);
   }
 }
