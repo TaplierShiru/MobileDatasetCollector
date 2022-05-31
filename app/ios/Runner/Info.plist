@@ -45,5 +45,9 @@
 	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Upload images (from some dataset) from device to a server</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Take photo of an object to upload dataset image to a server</string>
 </dict>
 </plist>
