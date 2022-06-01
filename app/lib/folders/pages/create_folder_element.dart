@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:app/folders/utils/create_folder_element_controller.dart';
+import 'package:app/user/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/validators/required_validator.dart';
 import '../../utils/validators/type_helpers.dart';
+import '../dtos/folder_element_update_dto.dart';
 import '../view_model/folders_view_model.dart';
 import '../widgets/upload_images_for_element.dart';
 
@@ -20,6 +24,7 @@ class CreateFolderElementWidget extends StatefulWidget {
 class _CreateFolderElementWidgetState extends State<CreateFolderElementWidget> {
   final _formKey = GlobalKey<FormState>();
 
+  var _isUploaded = false;
   late Future<void> _initData;
 
   final CreateFolderElementController _imageFilesHolder =
@@ -34,6 +39,9 @@ class _CreateFolderElementWidgetState extends State<CreateFolderElementWidget> {
   @override
   void dispose() {
     super.dispose();
+    for (var element in _imageFilesHolder.nameControllerList) {
+      element.dispose();
+    }
   }
 
   @override
@@ -45,7 +53,9 @@ class _CreateFolderElementWidgetState extends State<CreateFolderElementWidget> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          child: addImagesWidget(),
+          child: _isUploaded
+              ? const Center(child: CircularProgressIndicator())
+              : addImagesWidget(),
         ),
       ),
       floatingActionButton: saveButton(),
@@ -76,8 +86,31 @@ class _CreateFolderElementWidgetState extends State<CreateFolderElementWidget> {
 
   Widget saveButton() {
     return FloatingActionButton(
-      onPressed: () {
-        _imageFilesHolder.printSize();
+      onPressed: () async {
+        setState(() {
+          _isUploaded = true;
+        });
+        for (var i = 0; i < _imageFilesHolder.length; i++) {
+          final folderElementUpdate = FolderElementUpdateDto(
+            _imageFilesHolder.nameControllerList[i].text,
+            _imageFilesHolder.labelDropdownValueList[i],
+            base64Encode(
+              await _imageFilesHolder.imageFileList[i].readAsBytes(),
+            ),
+            context.read<UserViewModel>().getCurrentUser!,
+          );
+
+          if (!mounted) return;
+          await context
+              .read<FoldersViewModel>()
+              .createFolderElement(widget.folderId, folderElementUpdate);
+        }
+        setState(() {
+          _isUploaded = false;
+        });
+
+        if (!mounted) return;
+        Navigator.pop(context);
       },
       child: const Icon(Icons.save),
     );

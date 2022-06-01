@@ -155,20 +155,23 @@ class _UploadImagesForElementWidgetState
                     return PreviewImageWidget(
                         imageFile:
                             widget.imageFilesHolder.imageFileList![index],
-                        tag: 'singleImage-$index');
+                        tag: 'singleImage-created-$index');
                   },
                 ),
               );
             },
-            child: SizedBox(
-              height: 200,
-              child: Semantics(
-                label: 'image_picker_example_picked_image',
-                child: kIsWeb
-                    ? Image.network(
-                        widget.imageFilesHolder.imageFileList![index].path)
-                    : Image.file(File(
-                        widget.imageFilesHolder.imageFileList![index].path)),
+            child: Hero(
+              tag: 'singleImage-created-$index',
+              child: SizedBox(
+                height: 200,
+                child: Semantics(
+                  label: 'image_picker_example_picked_image',
+                  child: kIsWeb
+                      ? Image.network(
+                          widget.imageFilesHolder.imageFileList![index].path)
+                      : Image.file(File(
+                          widget.imageFilesHolder.imageFileList![index].path)),
+                ),
               ),
             ),
           ),

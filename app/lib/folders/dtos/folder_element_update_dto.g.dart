@@ -16,6 +16,7 @@ FolderElementUpdateDto _$FolderElementUpdateDtoFromJson(
     json['name'] as String,
     json['label'] as String,
     json['imageFile'] as String,
+    UserDto.fromJson(json['lastUserChange'] as Map<String, dynamic>),
   );
 }
 
@@ -25,4 +26,5 @@ Map<String, dynamic> _$FolderElementUpdateDtoToJson(
       'name': instance.name,
       'label': instance.label,
       'imageFile': instance.imageFile,
+      'lastUserChange': instance.lastUserChange,
     };

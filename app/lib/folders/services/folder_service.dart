@@ -3,6 +3,8 @@ import 'package:app/folders/dtos/folder_element_dto.dart';
 import 'package:app/user/dtos/user_dto.dart';
 import 'package:app/utils/helpers/filter_parameters_dto.dart';
 
+import '../dtos/folder_element_update_dto.dart';
+
 class FolderService {
   final List<FolderDto> _folderList = <FolderDto>[
     FolderDto('0', 'water', ['sick', 'health', 'unknown'], 100),
@@ -112,6 +114,11 @@ class FolderService {
         .firstWhere((element) => element.id == id));
   }
 
+  Future<List<String>> getLabelsOfFolder(String id) async {
+    await Future<void>.delayed(const Duration(seconds: 5));
+    return _folderList.firstWhere((element) => element.id == id).labels;
+  }
+
   Future<void> createFolder(FolderDto folderDto) async {
     await Future<void>.delayed(const Duration(seconds: 5));
     final newFolderDto = FolderDto((_folderList.length + 10).toString(),
@@ -119,8 +126,21 @@ class FolderService {
     _folderList.add(newFolderDto);
   }
 
-  Future<List<String>> getLabelsOfFolder(String id) async {
+  Future<void> createFolderElement(
+      String parentId, FolderElementUpdateDto folderElementUpdateDto) async {
     await Future<void>.delayed(const Duration(seconds: 5));
-    return _folderList.firstWhere((element) => element.id == id).labels;
+    if (!_id2folderElements.containsKey(parentId)) {
+      _id2folderElements[parentId] = [];
+    }
+    final newFolderElementDto = FolderElementDto(
+      (_id2folderElements[parentId]!.length + 10).toString(),
+      folderElementUpdateDto.name,
+      folderElementUpdateDto.label,
+      'https://www.acboatrentals.com/wp-content/uploads/2021/09/new.png',
+      DateTime.now(),
+      DateTime.now(),
+      folderElementUpdateDto.lastUserChange,
+    );
+    _id2folderElements[parentId]!.add(newFolderElementDto);
   }
 }

@@ -124,8 +124,8 @@ class _UserFoldersWidgetState extends State<UserFoldersWidget> {
     final folderElements = await context
         .read<FoldersViewModel>()
         .getElementsFolder(widget.folderId, filterDto);
-
     setState(() {
+      _folderElements = [];
       _folderElements = folderElements;
     });
     return Future<void>.value();

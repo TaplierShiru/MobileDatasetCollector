@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PreviewImageWidget extends StatelessWidget {
-  final XFile imageFile;
+  final XFile? imageFile;
   final String tag;
+  final Widget? imageWidget;
   const PreviewImageWidget(
-      {Key? key, required this.imageFile, this.tag = 'singleImagePreview'})
+      {Key? key,
+      required this.imageFile,
+      this.imageWidget,
+      this.tag = 'singleImagePreview'})
       : super(key: key);
 
   @override
@@ -21,9 +25,10 @@ class PreviewImageWidget extends StatelessWidget {
         child: Center(
           child: Hero(
             tag: tag,
-            child: kIsWeb
-                ? Image.network(imageFile.path)
-                : Image.file(File(imageFile.path)),
+            child: imageWidget ??
+                (kIsWeb
+                    ? Image.network(imageFile!.path)
+                    : Image.file(File(imageFile!.path))),
           ),
         ),
       ),
