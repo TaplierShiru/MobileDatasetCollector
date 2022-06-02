@@ -10,7 +10,7 @@ services:
       USERNAME: root
       MYSQL_ROOT_PASSWORD: lkdawd+2dawpd20
     volumes:
-      - ./server_web/static:/static
+      - ./static:/static
     ports:
       - "3117:3117"
     depends_on:
@@ -24,4 +24,4 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./routers/database/data/mysql:/var/lib/mysql
+      - ./static/database/mysql:/var/lib/mysql

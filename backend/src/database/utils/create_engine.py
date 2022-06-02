@@ -16,8 +16,8 @@ def create_engine(db_url: str = None) -> MockConnection:
             create_database(DATABASE_NAME)
         else:
             cur_path = os.path.dirname(os.path.realpath(__file__))
-            cur_path = "\\".join(cur_path.split('\\')[:-1]) # Skip this folder `utils`
-            db_url = f'sqlite:///{cur_path}/data/mysql_debug/debug_db.db'
+            cur_path = "\\".join(cur_path.split('\\')[:-3]) # Skip this path `src/database/utils`
+            db_url = f'sqlite:///{cur_path}/static/database/mysql_debug/debug_db.db'
             print(db_url)
             echo = True
 
