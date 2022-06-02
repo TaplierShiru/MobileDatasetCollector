@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/validators/type_helpers.dart';
+import '../../utils/widgets/text_form_field.dart';
 import '../dtos/folder_element_update_dto.dart';
 import '../widgets/preview_image.dart';
 
@@ -86,11 +87,10 @@ class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
         Center(
           child: _imagePreview(),
         ),
-        textFormField(
-          'Name',
-          'Name of the image',
-          _nameController,
-          requiredValidator,
+        TextFormFieldWidget(
+          controller: _nameController,
+          labelText: 'Name',
+          hintText: 'Name of the image',
         ),
         _initDropdownLabelsButton(),
         Text(_folderElementDto.id),
@@ -279,24 +279,6 @@ class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
     } else {
       _retrieveDataError = response.exception!.code;
     }
-  }
-
-  Widget textFormField(String labelText, String hintText,
-      TextEditingController controller, ValidatorCall validator,
-      {Widget? suffixIcon}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          labelText: labelText,
-          hintText: hintText,
-          suffixIcon: suffixIcon,
-        ),
-        validator: validator,
-      ),
-    );
   }
 
   Future<void> _refresh() async {

@@ -19,6 +19,9 @@ class _UserFoldersWidgetState extends State<UserFoldersWidget> {
   final _boxHeight = 300;
   final _boxWidth = 250;
   var _search = '';
+  var _isDeleteMode = false;
+  var _isInProgress = false;
+  final Set<int> _selectedIndexToDelete = {};
 
   late List<FolderElementDto> _folderElements;
   late Future<void> _initData;
@@ -34,6 +37,7 @@ class _UserFoldersWidgetState extends State<UserFoldersWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Folder id=${widget.folderId}'),
+        actions: appBarActions(),
       ),
       body: FutureBuilder(
         future: _initData,
@@ -59,54 +63,52 @@ class _UserFoldersWidgetState extends State<UserFoldersWidget> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Go to folder creation page
-          Navigator.pushNamed(
-            context,
-            AppRoute.routes[RouteEnum.createFolderElementRoute]!,
-            arguments: widget.folderId,
-          );
-        },
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: getFloatingActionButton(),
     );
+  }
+
+  List<Widget> appBarActions() {
+    return <Widget>[
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: _changeDeleteModeStateActionButton(),
+      ),
+    ];
   }
 
   Widget getSliverGrid(BuildContext context) {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate((context, index) {
-        final image =
-            Image.network(_folderElements[index].imageUrl, fit: BoxFit.contain);
         return GestureDetector(
           onTap: () {
+            if (_isInProgress) {
+              return;
+            }
+
+            if (_isDeleteMode) {
+              setState(() {
+                if (_selectedIndexToDelete.contains(index)) {
+                  _selectedIndexToDelete.remove(index);
+                } else {
+                  _selectedIndexToDelete.add(index);
+                }
+              });
+              return;
+            }
             Navigator.pushNamed(
-                context, AppRoute.routes[RouteEnum.singleFolderElementRoute]!,
-                arguments: {
-                  'folderElementDto': _folderElements[index],
-                  'folderId': widget.folderId
-                });
+              context,
+              AppRoute.routes[RouteEnum.singleFolderElementRoute]!,
+              arguments: {
+                'folderElementDto': _folderElements[index],
+                'folderId': widget.folderId,
+              },
+            );
           },
           child: Container(
             height: 300,
             alignment: Alignment.center,
             color: Colors.blue,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  height: 150,
-                  child: Hero(
-                    tag: 'to-single-element-index-${_folderElements[index].id}',
-                    child: image,
-                  ),
-                ),
-                Text(_folderElements[index].name),
-                Text(_folderElements[index].label),
-                Text(_folderElements[index].id),
-              ],
-            ),
+            child: _columnSingleElementView(index),
           ),
         );
       }, childCount: _folderElements.length),
@@ -119,13 +121,117 @@ class _UserFoldersWidgetState extends State<UserFoldersWidget> {
     );
   }
 
+  Widget _columnSingleElementView(int index) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        AnimatedOpacity(
+          opacity: _isDeleteMode ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 400),
+          child: Align(
+            alignment: Alignment.topRight,
+            child: _selectedIndexToDelete.contains(index)
+                ? const Icon(Icons.check_box)
+                : const Icon(Icons.check_box_outline_blank),
+          ),
+        ),
+        SizedBox(
+          height: 150,
+          child: Hero(
+            tag: 'to-single-element-index-${_folderElements[index].id}',
+            child: Image.network(_folderElements[index].imageUrl,
+                fit: BoxFit.contain),
+          ),
+        ),
+        Text(_folderElements[index].name),
+        Text(_folderElements[index].label),
+        Text(_folderElements[index].id),
+      ],
+    );
+  }
+
+  Widget getFloatingActionButton() {
+    if (_isInProgress) {
+      return const CircularProgressIndicator(
+        backgroundColor: Colors.white,
+      );
+    }
+
+    if (_isDeleteMode) {
+      return _deleteSelectedFloatingActionButton();
+    }
+
+    return _addFloatingActionButton();
+  }
+
+  Widget _deleteSelectedFloatingActionButton() {
+    return FloatingActionButton(
+      onPressed: () async {
+        if (_isInProgress) {
+          return;
+        }
+        setState(() {
+          _isInProgress = true;
+        });
+        final folderViewModel = context.read<FoldersViewModel>();
+        for (var index in _selectedIndexToDelete) {
+          await folderViewModel.deleteFolderElement(
+            widget.folderId,
+            _folderElements[index],
+          );
+        }
+        await _refresh();
+        setState(() {
+          _isInProgress = false;
+        });
+      },
+      backgroundColor: Colors.blue,
+      child: const Icon(Icons.delete),
+    );
+  }
+
+  Widget _addFloatingActionButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        if (_isInProgress) {
+          return;
+        }
+        // Go to folder creation page
+        Navigator.pushNamed(
+          context,
+          AppRoute.routes[RouteEnum.createFolderElementRoute]!,
+          arguments: widget.folderId,
+        );
+      },
+      backgroundColor: Colors.blue,
+      child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _changeDeleteModeStateActionButton() {
+    return IconButton(
+      onPressed: () {
+        if (_isInProgress) {
+          return;
+        }
+        setState(() {
+          _isDeleteMode = !_isDeleteMode;
+          if (!_isDeleteMode) {
+            _selectedIndexToDelete.clear();
+          }
+        });
+      },
+      icon: const Icon(Icons.delete_sweep),
+    );
+  }
+
   Future<void> _refresh() async {
     final filterDto = FilterParametersDto(_search);
     final folderElements = await context
         .read<FoldersViewModel>()
         .getElementsFolder(widget.folderId, filterDto);
     setState(() {
-      _folderElements = [];
+      _selectedIndexToDelete.clear();
       _folderElements = folderElements;
     });
     return Future<void>.value();

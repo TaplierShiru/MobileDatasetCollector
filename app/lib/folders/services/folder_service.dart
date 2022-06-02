@@ -91,14 +91,14 @@ class FolderService {
 
   Future<List<FolderDto>> getFolders(
       FilterParametersDto filterParametersDto) async {
-    await Future<void>.delayed(const Duration(seconds: 3));
+    await Future<void>.delayed(const Duration(seconds: 2));
 
     return Future<List<FolderDto>>.value(_folderList);
   }
 
   Future<List<FolderElementDto>> getElementsFolder(
       String id, FilterParametersDto filterParametersDto) async {
-    await Future<void>.delayed(const Duration(seconds: 3));
+    await Future<void>.delayed(const Duration(seconds: 2));
 
     if (!_id2folderElements.containsKey(id)) {
       _id2folderElements[id] = [];
@@ -108,19 +108,19 @@ class FolderService {
   }
 
   Future<FolderElementDto> getElementFolder(String parentId, String id) async {
-    await Future<void>.delayed(const Duration(seconds: 5));
+    await Future<void>.delayed(const Duration(seconds: 2));
 
     return Future<FolderElementDto>.value(_id2folderElements[parentId]!
         .firstWhere((element) => element.id == id));
   }
 
   Future<List<String>> getLabelsOfFolder(String id) async {
-    await Future<void>.delayed(const Duration(seconds: 5));
+    await Future<void>.delayed(const Duration(seconds: 2));
     return _folderList.firstWhere((element) => element.id == id).labels;
   }
 
   Future<void> createFolder(FolderDto folderDto) async {
-    await Future<void>.delayed(const Duration(seconds: 5));
+    await Future<void>.delayed(const Duration(seconds: 2));
     final newFolderDto = FolderDto((_folderList.length + 10).toString(),
         folderDto.folderName, folderDto.labels, 66);
     _folderList.add(newFolderDto);
@@ -128,7 +128,7 @@ class FolderService {
 
   Future<void> createFolderElement(
       String parentId, FolderElementUpdateDto folderElementUpdateDto) async {
-    await Future<void>.delayed(const Duration(seconds: 5));
+    await Future<void>.delayed(const Duration(seconds: 2));
     if (!_id2folderElements.containsKey(parentId)) {
       _id2folderElements[parentId] = [];
     }
@@ -142,5 +142,13 @@ class FolderService {
       folderElementUpdateDto.lastUserChange,
     );
     _id2folderElements[parentId]!.add(newFolderElementDto);
+  }
+
+  Future<void> deleteFolderElement(
+      String parentId, FolderElementDto folderElementDto) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    _id2folderElements[parentId]!
+        .removeWhere((element) => element.id == folderElementDto.id);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../utils/validators/required_validator.dart';
 import '../../../utils/validators/type_helpers.dart';
 import '../../../utils/widgets/async_button.dart';
+import '../../../utils/widgets/text_form_field.dart';
 
 class ChangePasswordUserWidget extends StatefulWidget {
   const ChangePasswordUserWidget({Key? key}) : super(key: key);
@@ -38,29 +39,19 @@ class _ChangePasswordUserWidgetState extends State<ChangePasswordUserWidget> {
               textAlign: TextAlign.center,
             ),
           ),
-          textFormField('Old password', 'Enter your old password',
-              oldPasswordController, requiredValidator),
-          textFormField('Last name', 'Enter your last name',
-              newPasswordController, requiredValidator),
+          TextFormFieldWidget(
+            controller: oldPasswordController,
+            labelText: 'Old password',
+            hintText: 'Enter your old password',
+          ),
+          TextFormFieldWidget(
+            controller: newPasswordController,
+            labelText: 'Last name',
+            hintText: 'Enter your last name',
+          ),
           updateProfilePasswordButton(),
           const Padding(padding: EdgeInsets.only(bottom: 8)),
         ],
-      ),
-    );
-  }
-
-  Widget textFormField(String labelText, String hintText,
-      TextEditingController controller, ValidatorCall validator) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          labelText: labelText,
-          hintText: hintText,
-        ),
-        validator: validator,
       ),
     );
   }

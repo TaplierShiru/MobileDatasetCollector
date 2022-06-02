@@ -3,10 +3,11 @@ import 'package:app/core/utils/status_code_enum.dart';
 import 'package:app/user/view_model/user_view_model.dart';
 import 'package:app/utils/validators/required_validator.dart';
 import 'package:app/utils/widgets/async_button.dart';
+import 'package:app/utils/widgets/text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../utils/exceptions/request_exception.dart';
+import '../../utils/exceptions/request_exception.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({Key? key}) : super(key: key);
@@ -16,14 +17,14 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
-  final userNameController = TextEditingController();
+  final userEmailController = TextEditingController();
   final passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    userNameController.dispose();
+    userEmailController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -51,31 +52,15 @@ class _LoginWidgetState extends State<LoginWidget> {
                       child: Image.asset('assets/logo/flutter-logo.png')),
                 ),
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: TextFormField(
-                  controller: userNameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Username/email',
-                    hintText: 'Enter valid username or email',
-                  ),
-                  validator: requiredValidator,
-                ),
+              TextFormFieldWidget(
+                controller: userEmailController,
+                labelText: 'Email',
+                hintText: 'Enter your email',
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: TextFormField(
-                  controller: passwordController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                  ),
-                  validator: requiredValidator,
-                ),
+              TextFormFieldWidget(
+                controller: passwordController,
+                labelText: 'Password',
+                hintText: 'Enter your password',
               ),
               forgotButton(),
               loginButton(),
@@ -91,7 +76,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     return AsyncButton(
       onAsyncCall: () async {
         if (_formKey.currentState!.validate()) {
-          String usernameOrEmail = userNameController.text;
+          String usernameOrEmail = userEmailController.text;
           String password = passwordController.text;
           try {
             await Provider.of<UserViewModel>(context, listen: false)

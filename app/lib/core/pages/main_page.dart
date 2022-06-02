@@ -1,7 +1,7 @@
 import 'package:app/core/routes/routes.dart';
 import 'package:flutter/material.dart';
-import '../../../folders/widgets/folders.dart';
-import '../../widgets/drawer_menu.dart';
+import '../../folders/widgets/folders.dart';
+import '../widgets/drawer_menu.dart';
 
 class MainPageWidget extends StatelessWidget {
   const MainPageWidget({Key? key}) : super(key: key);

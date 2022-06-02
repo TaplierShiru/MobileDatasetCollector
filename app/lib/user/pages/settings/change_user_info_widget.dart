@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../utils/validators/required_validator.dart';
 import '../../../utils/validators/type_helpers.dart';
 import '../../../utils/widgets/async_button.dart';
+import '../../../utils/widgets/text_form_field.dart';
 
 class ChangeUserInfoWidget extends StatefulWidget {
   const ChangeUserInfoWidget({Key? key}) : super(key: key);
@@ -53,33 +54,29 @@ class _ChangeUserInfoWidgetState extends State<ChangeUserInfoWidget> {
               textAlign: TextAlign.center,
             ),
           ),
-          textFormField('First name', 'Enter your first name',
-              firstNameController, requiredValidator),
-          textFormField('Last name', 'Enter your last name', lastNameController,
-              requiredValidator),
-          textFormField(
-              'Email', 'Enter your email', emailController, requiredValidator),
-          textFormField(
-              'Phone', 'Enter your phone', phoneController, requiredValidator),
+          TextFormFieldWidget(
+            controller: firstNameController,
+            labelText: 'First name',
+            hintText: 'Enter your first name',
+          ),
+          TextFormFieldWidget(
+            controller: lastNameController,
+            labelText: 'Last name',
+            hintText: 'Enter your last name',
+          ),
+          TextFormFieldWidget(
+            controller: emailController,
+            labelText: 'Email',
+            hintText: 'Enter your email',
+          ),
+          TextFormFieldWidget(
+            controller: phoneController,
+            labelText: 'Phone',
+            hintText: 'Enter your phone',
+          ),
           updateProfileButton(),
           const Padding(padding: EdgeInsets.only(bottom: 8)),
         ],
-      ),
-    );
-  }
-
-  Widget textFormField(String labelText, String hintText,
-      TextEditingController controller, ValidatorCall validator) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          labelText: labelText,
-          hintText: hintText,
-        ),
-        validator: validator,
       ),
     );
   }

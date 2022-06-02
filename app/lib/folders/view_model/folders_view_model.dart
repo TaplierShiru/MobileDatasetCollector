@@ -36,4 +36,10 @@ class FoldersViewModel extends ChangeNotifier {
     await _folderService.createFolderElement(parentId, folderElementUpdateDto);
     notifyListeners();
   }
+
+  Future<void> deleteFolderElement(
+      String parentId, FolderElementDto folderElementDto) async {
+    await _folderService.deleteFolderElement(parentId, folderElementDto);
+    notifyListeners();
+  }
 }

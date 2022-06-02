@@ -1,16 +1,15 @@
 import 'package:app/folders/dtos/folder_element_dto.dart';
 import 'package:app/folders/pages/single_folder_element.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
-import '../../auth/pages/login/login.dart';
-import '../../auth/pages/registration/registration.dart';
+import '../../auth/pages/login.dart';
+import '../../auth/pages/registration.dart';
 import '../../folders/pages/create_folder.dart';
 import '../../folders/pages/create_folder_element.dart';
 import '../../folders/pages/user_folders.dart';
 import '../../user/pages/settings/settings_page.dart';
-import '../pages/error_page/error_page.dart';
-import '../pages/main_page/main_page.dart';
+import '../pages/error_page.dart';
+import '../pages/main_page.dart';
 
 enum RouteEnum {
   initialRoute,

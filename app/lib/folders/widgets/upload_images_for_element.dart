@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../utils/validators/type_helpers.dart';
+import '../../utils/widgets/text_form_field.dart';
 import '../utils/create_folder_element_controller.dart';
 
 typedef OnPickImageCallback = void Function(
@@ -177,11 +178,13 @@ class _UploadImagesForElementWidgetState
           ),
           Column(
             children: [
-              textFormField(
-                'Name',
-                'Name of the image',
-                widget.imageFilesHolder.nameControllerList[index],
-                requiredValidator,
+              SizedBox(
+                height: 200,
+                child: TextFormFieldWidget(
+                  controller: widget.imageFilesHolder.nameControllerList[index],
+                  labelText: 'Name',
+                  hintText: 'Name of the image',
+                ),
               ),
               Row(
                 children: [
@@ -260,27 +263,6 @@ class _UploadImagesForElementWidgetState
         });
       }
     }
-  }
-
-  Widget textFormField(String labelText, String hintText,
-      TextEditingController controller, ValidatorCall validator,
-      {Widget? suffixIcon}) {
-    return SizedBox(
-      width: 200,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        child: TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            labelText: labelText,
-            hintText: hintText,
-            suffixIcon: suffixIcon,
-          ),
-          validator: validator,
-        ),
-      ),
-    );
   }
 
   Future<void> retrieveLostData() async {

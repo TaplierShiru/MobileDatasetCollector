@@ -5,9 +5,9 @@ import 'package:app/utils/validators/required_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/dtos/request_dto.dart';
-import '../../../utils/validators/type_helpers.dart';
-import '../../../utils/widgets/async_button.dart';
+import '../../core/dtos/request_dto.dart';
+import '../../utils/validators/type_helpers.dart';
+import '../../utils/widgets/async_button.dart';
 
 class RegistrationWidget extends StatefulWidget {
   const RegistrationWidget({Key? key}) : super(key: key);
