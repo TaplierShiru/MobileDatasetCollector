@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker, Session
 
 from src.database.utils import create_engine
-from src.database.tables import Base, User
+from src.database.tables import Base
 
 
 ENGINE = create_engine()

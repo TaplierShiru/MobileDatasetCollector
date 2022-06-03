@@ -9,18 +9,18 @@ from .base import Base
 
 class FolderElement(Base):
     __tablename__ = 'folder_elements'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=uuid.uuid4)
     name = Column(String)
     image_path = Column(String)
     date_uploaded = Column(Date)
     date_changed = Column(Date)
 
-    last_user_change_id = Column(String, ForeignKey('users.id'))
-    last_user_change = relationship('User')
-    label_id = Column(String, ForeignKey('labels.id'))
-    label = relationship('Label', backref='folder_elements')
-    folder_id = Column(String, ForeignKey('folders.id'))
-    folder = relationship('Folder')
+    last_user_change_id = Column(String, ForeignKey('users.id'), default=uuid.uuid4)
+    folder_id = Column(String, ForeignKey('folders.id'), default=uuid.uuid4)
+
+    last_user_change = relationship('User', back_populates='folder_elements_changed')
+    folder = relationship('Folder', back_populates='labels')
+    label_connection = relationship('FolderElementToLabel', back_populates='folder_element')
 
     def __init__(self, folder_name):
         self.folder_name = folder_name

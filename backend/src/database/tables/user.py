@@ -10,7 +10,7 @@ from ..utils.constants import PASSWORD_LEN, SALT_LEN
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=uuid.uuid4)
     email = Column(String, unique=True)
     first_name = Column(String)
     last_name = Column(String)
@@ -19,7 +19,7 @@ class User(Base):
     password = Column(LargeBinary(PASSWORD_LEN))
     salt = Column(LargeBinary(SALT_LEN))
 
-    folder_elements_changed = relationship('FolderElement', backref='last_user_change', cascade='all, delete')
+    folder_elements_changed = relationship('FolderElement', back_populates='last_user_change')
 
     def __init__(self, email, first_name, last_name, phone, password, salt, role):
         self.email = email

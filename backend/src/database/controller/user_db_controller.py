@@ -65,18 +65,18 @@ class UserDbController:
         return False
 
     @staticmethod
-    def login(email: str, password: str) -> bool:
+    def login(email: str, password: str) -> Union[User, None]:
         try:
             with get_session() as session:
                 user: User = session.query(User).filter_by(email=email).first()
                 if not UserDbController.is_exist(user):
-                    return False
+                    return
                 hashbytes, _ = get_hash(password=password, salt=user.salt)
-                return hashbytes == user.password
+                if hashbytes == user.password:
+                    return user
         except Exception as e:
             print(e)
             traceback.print_exc()
-        return False
 
     @staticmethod
     def get_user_role(user: User) -> str:
