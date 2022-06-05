@@ -7,7 +7,7 @@ from src.database.tables import Base
 ENGINE = create_engine()
 # Create tables
 Base.metadata.create_all(ENGINE)
-SESSION_MAKER = sessionmaker(bind=ENGINE)
+SESSION_MAKER = sessionmaker(bind=ENGINE, expire_on_commit=False)
 
 
 def get_session() -> Session:

@@ -1,15 +1,14 @@
 import uuid
 
-from sqlalchemy import Column, String, LargeBinary
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from src.database.tables import Base
 
 
 class Folder(Base):
     __tablename__ = 'folders'
-    id = Column(String, primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
     folder_name = Column(String)
 
     folder_elements = relationship('FolderElement', cascade='all, delete-orphan', back_populates='folder')

@@ -21,8 +21,10 @@ def create_app():
         allow_headers=["*"],
     )
     """
-    from src import auth
-    app.include_router(auth.router)
+    from src import user
+    app.include_router(user.router)
+    from src import folder
+    app.include_router(folder.router)
 
     app.mount("/static", StaticFiles(directory="static"), name="static")
     return app

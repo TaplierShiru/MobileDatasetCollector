@@ -3,18 +3,18 @@ import uuid
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from src.database.tables import Base
 
 
 class Label(Base):
     __tablename__ = 'labels'
-    id = Column(String, primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
     label_name = Column(String)
 
     folder_id = Column(String, ForeignKey('folders.id'), default=uuid.uuid4)
 
     folder = relationship('Folder', back_populates='labels')
-    folder_element_connection = relationship('FolderElement', back_populates='label')
+    folder_element_connection = relationship('FolderElementToLabel', back_populates='label')
 
     def __init__(self, label_name):
         self.label_name = label_name

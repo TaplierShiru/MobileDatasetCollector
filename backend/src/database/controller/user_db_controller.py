@@ -1,51 +1,49 @@
 import traceback
 from typing import List, Dict, Union
 
+from src.user.dto import UserRegisterDto
 from src.database.controller.session_controller import get_session
 from src.database.tables import User
 from src.database.utils import get_hash, ROLE_ADMIN
+from src.utils import log
 
 
 class UserDbController:
 
     @staticmethod
-    def get_user(user: User) -> Union[User, None]:
+    def get_user(id: Union[str, None], email: Union[str, None] = None) -> Union[User, None]:
         try:
+            if id is None and email is None:
+                raise Exception('Id or email must be provided to `get_user` function')
             with get_session() as session:
-                user: User = session.query(User).filter_by(id=user.id).first()
+                if email is None:
+                    user: User = session.query(User).filter_by(id=id).first()
+                else:
+                    user: User = session.query(User).filter_by(email=email).first()
                 return user
         except Exception as e:
             print(e)
             traceback.print_exc()
 
     @staticmethod
-    def is_exist(user: User) -> bool:
+    def add_user(user_register_dto: UserRegisterDto) -> bool:
         try:
-            with get_session() as session:
-                user: User = session.query(User).filter_by(email=user.email).first()
-                if user is None:
-                    return False
-                return True
-        except Exception as e:
-            print(e)
-            traceback.print_exc()
-        return False
-
-    @staticmethod
-    def add_user(user: User) -> bool:
-        try:
-            if UserDbController.is_exist(user):
+            found_user = UserDbController.get_user(None, email=user_register_dto.email)
+            if found_user is not None:
+                log.debug(f'User already exist, input=[{user_register_dto}], existed user=[{found_user}]')
                 return False
             # Create salt and hash for password
-            salt, hashpass = get_hash(password=user.password)
-            user.salt = salt
-            user.role = ROLE_ADMIN
+            hashpass, salt = get_hash(password=user_register_dto.password)
+            user = User(
+                user_register_dto.email, user_register_dto.firstName, user_register_dto.lastName,
+                user_register_dto.phone, password=hashpass, salt=salt, role=ROLE_ADMIN
+            )
             with get_session() as session:
                 session.add(user)
                 session.commit()
                 return True
         except Exception as e:
-            print(e)
+            log.debug(e)
             traceback.print_exc()
         return False
 
@@ -67,19 +65,19 @@ class UserDbController:
     @staticmethod
     def login(email: str, password: str) -> Union[User, None]:
         try:
-            with get_session() as session:
-                user: User = session.query(User).filter_by(email=email).first()
-                if not UserDbController.is_exist(user):
-                    return
-                hashbytes, _ = get_hash(password=password, salt=user.salt)
-                if hashbytes == user.password:
-                    return user
+            user: Union[User, None] = UserDbController.get_user(None, email=email)
+            if user is None:
+                return
+            hashbytes, _ = get_hash(password=password, salt=user.salt)
+            if hashbytes == user.password:
+                return user
+            print('wrong hash')
         except Exception as e:
             print(e)
             traceback.print_exc()
 
     @staticmethod
-    def get_user_role(user: User) -> str:
+    def get_user_role(user: User) -> Union[str, None]:
         try:
             with get_session() as session:
                 user: User = session.query(User).filter_by(id=user.id).first()

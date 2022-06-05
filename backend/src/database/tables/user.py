@@ -1,16 +1,15 @@
 import uuid
 
 from sqlalchemy import Column, String, LargeBinary
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from src.database.tables import Base
 from ..utils.constants import PASSWORD_LEN, SALT_LEN
 
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(String, primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
     email = Column(String, unique=True)
     first_name = Column(String)
     last_name = Column(String)
