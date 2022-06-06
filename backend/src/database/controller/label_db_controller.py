@@ -2,7 +2,6 @@ import traceback
 from typing import Union
 
 from src.database.controller.session_controller import get_session
-from src.database.tables import Folder, FolderElement
 from src.database.tables.label import Label
 
 

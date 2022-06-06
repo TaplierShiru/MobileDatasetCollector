@@ -4,6 +4,7 @@ from typing import List, Union
 from sqlalchemy.orm import Session
 
 from src.database.controller.folder_db_controller import FolderDbController
+from src.database.controller.folder_element_to_label_db_controller import FolderElementToLabelDbController
 from src.database.controller.label_db_controller import LabelDbController
 from src.database.controller.session_controller import get_session
 from src.database.controller.user_db_controller import UserDbController
@@ -39,17 +40,23 @@ class FolderElementDbController:
             folder_element_update_dto: FolderElementUpdateDto) -> Union[FolderElementDto, None]:
         try:
             with get_session() as session:
-                folder: Folder = FolderDbController.get_folder(parent_id, session)
+                folder: Union[Folder, None] = FolderDbController.get_folder(parent_id, session)
                 if folder is None:
                     return
                 new_folder_element = FolderElement(folder_element_update_dto.name)
-                new_folder_element.label = LabelDbController.get_label(folder_element_update_dto.label.id)
-                new_folder_element.image_path = ImageController.save_image(folder_element_update_dto.image_file)
+                if folder_element_update_dto.image_file is not None:
+                    new_folder_element.image_path = ImageController.save_image(folder_element_update_dto.image_file)
                 new_folder_element.date_uploaded = folder_element_update_dto.date_uploaded
                 new_folder_element.date_changed = folder_element_update_dto.date_changed
                 new_folder_element.last_user_change = UserDbController.get_user(
                     folder_element_update_dto.last_user_change.id
                 )
+
+                label = LabelDbController.get_label(folder_element_update_dto.label.id)
+                new_folder_element.label_connection = FolderElementToLabelDbController.create_connection(
+                    new_folder_element, label
+                )
+
                 folder.folder_elements.append(new_folder_element)
                 session.commit()
                 return FolderElementDto.from_database(new_folder_element)
@@ -68,7 +75,6 @@ class FolderElementDbController:
                     return
                 # Update fields
                 folder_element.name = folder_element_update_dto.name
-                folder_element.label = LabelDbController.get_label(folder_element_update_dto.label.id)
                 if folder_element_update_dto.image_file is not None:
                     # TODO: delete old images
                     folder_element.image_path = ImageController.save_image(folder_element_update_dto.image_file)
@@ -77,6 +83,13 @@ class FolderElementDbController:
                 folder_element.last_user_change = UserDbController.get_user(
                     folder_element_update_dto.last_user_change.id
                 )
+
+                label = LabelDbController.get_label(folder_element_update_dto.label.id)
+                FolderElementToLabelDbController.update_label_connection(
+                    folder_element.label_connection.id,
+                    label, session
+                )
+
                 session.commit()
                 return folder_element
         except Exception as e:

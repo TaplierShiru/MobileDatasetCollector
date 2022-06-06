@@ -8,7 +8,6 @@ from src.database.controller.session_controller import get_session
 from src.database.tables import Folder, Label
 from src.folder.dto.folder_dto import FolderDto
 from src.folder.dto.folder_update_dto import FolderUpdateDto
-from src.folder.dto.folder_with_elements_dto import FolderWithElementsDto
 from src.utils import log
 from src.utils.dto import FilterDto
 
@@ -16,20 +15,19 @@ from src.utils.dto import FilterDto
 class FolderDbController:
 
     @staticmethod
-    def get_folder_with_elements(id: str) -> Union[FolderWithElementsDto, None]:
+    def get_folder(id: str) -> Union[FolderDto, None]:
         try:
             with get_session() as session:
-                folder: Folder = FolderDbController.get_folder(id, session)
+                folder: Union[Folder, None] = FolderDbController._get_folder(id, session)
                 if folder is None:
                     return
-                folder_with_elements = FolderWithElementsDto.from_database(folder)
-                return folder_with_elements
+                return FolderDto.from_database(folder)
         except Exception as e:
             log.debug(e)
             traceback.print_exc()
 
     @staticmethod
-    def get_folder(id: str, session: Session) -> Union[Folder, None]:
+    def _get_folder(id: str, session: Session) -> Union[Folder, None]:
         return session.query(Folder).filter_by(id=id).first()
 
     @staticmethod
@@ -53,7 +51,7 @@ class FolderDbController:
     def update_folder(id: str, folder_update_dto: FolderUpdateDto) -> Union[FolderDto, None]:
         try:
             with get_session() as session:
-                folder: Union[Folder, None] = FolderDbController.get_folder(id, session)
+                folder: Union[Folder, None] = FolderDbController._get_folder(id, session)
                 if folder is None:
                     return
                 # Check each label
@@ -81,7 +79,7 @@ class FolderDbController:
     def remove_folder(id: str) -> bool:
         try:
             with get_session() as session:
-                folder: Folder = FolderDbController.get_folder(id)
+                folder: Folder = FolderDbController._get_folder(id, session)
                 if folder is None:
                     return False
                 session.delete(folder)

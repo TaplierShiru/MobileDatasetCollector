@@ -1,8 +1,7 @@
 from sqlalchemy.orm import sessionmaker, Session
 
-from src.database.utils import create_engine
 from src.database.tables import Base
-
+from src.database.utils import create_engine
 
 ENGINE = create_engine()
 # Create tables

@@ -1,44 +1,58 @@
 import traceback
 from typing import List, Dict, Union
 
-from src.user.dto import UserRegisterDto
+from sqlalchemy.orm import Session
+
 from src.database.controller.session_controller import get_session
 from src.database.tables import User
 from src.database.utils import get_hash, ROLE_ADMIN
+from src.user.dto import UserRegisterDto
+from src.user.dto.user_dto import UserDto
 from src.utils import log
 
 
 class UserDbController:
 
     @staticmethod
-    def get_user(id: Union[str, None], email: Union[str, None] = None) -> Union[User, None]:
+    def get_user(email: str) -> Union[UserDto, None]:
+        try:
+            with get_session() as session:
+                user = UserDbController._get_user(session, None, email)
+                if user is None:
+                    return
+                return UserDto.from_database(user)
+        except Exception as e:
+            log.debug(e)
+            traceback.print_exc()
+
+    @staticmethod
+    def _get_user(session: Session, id: Union[str, None], email: Union[str, None] = None) -> Union[User, None]:
         try:
             if id is None and email is None:
-                raise Exception('Id or email must be provided to `get_user` function')
-            with get_session() as session:
-                if email is None:
-                    user: User = session.query(User).filter_by(id=id).first()
-                else:
-                    user: User = session.query(User).filter_by(email=email).first()
-                return user
+                raise Exception('Id or email must be provided to `_get_user` function')
+            if email is None:
+                user: User = session.query(User).filter_by(id=id).first()
+            else:
+                user: User = session.query(User).filter_by(email=email).first()
+            return user
         except Exception as e:
-            print(e)
+            log.debug(e)
             traceback.print_exc()
 
     @staticmethod
     def add_user(user_register_dto: UserRegisterDto) -> bool:
         try:
-            found_user = UserDbController.get_user(None, email=user_register_dto.email)
-            if found_user is not None:
-                log.debug(f'User already exist, input=[{user_register_dto}], existed user=[{found_user}]')
-                return False
-            # Create salt and hash for password
-            hashpass, salt = get_hash(password=user_register_dto.password)
-            user = User(
-                user_register_dto.email, user_register_dto.firstName, user_register_dto.lastName,
-                user_register_dto.phone, password=hashpass, salt=salt, role=ROLE_ADMIN
-            )
             with get_session() as session:
+                found_user = UserDbController._get_user(session, None, email=user_register_dto.email)
+                if found_user is not None:
+                    log.debug(f'User already exist, input=[{user_register_dto}], existed user=[{found_user}]')
+                    return False
+                # Create salt and hash for password
+                hashpass, salt = get_hash(password=user_register_dto.password)
+                user = User(
+                    user_register_dto.email, user_register_dto.firstName, user_register_dto.lastName,
+                    user_register_dto.phone, password=hashpass, salt=salt, role=ROLE_ADMIN
+                )
                 session.add(user)
                 session.commit()
                 return True
@@ -58,26 +72,27 @@ class UserDbController:
                 session.commit()
                 return True
         except Exception as e:
-            print(e)
+            log.debug(e)
             traceback.print_exc()
         return False
 
     @staticmethod
-    def login(email: str, password: str) -> Union[User, None]:
+    def login(email: str, password: str) -> Union[UserDto, None]:
         try:
-            user: Union[User, None] = UserDbController.get_user(None, email=email)
-            if user is None:
-                return
-            hashbytes, _ = get_hash(password=password, salt=user.salt)
-            if hashbytes == user.password:
-                return user
-            print('wrong hash')
+            with get_session() as session:
+                user: Union[User, None] = UserDbController._get_user(session, None, email=email)
+                if user is None:
+                    return
+                hashbytes, _ = get_hash(password=password, salt=user.salt)
+                if hashbytes != user.password:
+                    return
+                return UserDto.from_database(user)
         except Exception as e:
-            print(e)
+            log.debug(e)
             traceback.print_exc()
 
     @staticmethod
-    def get_user_role(user: User) -> Union[str, None]:
+    def _get_user_role(user: User) -> Union[str, None]:
         try:
             with get_session() as session:
                 user: User = session.query(User).filter_by(id=user.id).first()
@@ -85,7 +100,7 @@ class UserDbController:
                     return
                 return user.role
         except Exception as e:
-            print(e)
+            log.debug(e)
             traceback.print_exc()
 
     @staticmethod
@@ -118,7 +133,7 @@ class UserDbController:
                     })
                 return new_users_list
         except Exception as e:
-            print(e)
+            log.debug(e)
             traceback.print_exc()
 
 """

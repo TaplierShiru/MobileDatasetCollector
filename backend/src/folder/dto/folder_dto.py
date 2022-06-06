@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from src.database.tables import User, Folder
+from src.database.tables import Folder
 from src.shared.dto import LabelDto
 
 

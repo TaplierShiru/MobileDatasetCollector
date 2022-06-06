@@ -1,7 +1,7 @@
 from typing import List, Union
 
+from fastapi import HTTPException
 from starlette import status
-from starlette.responses import Response
 
 from .folder_controller import router
 from ..dto.folder_dto import FolderDto
@@ -12,43 +12,43 @@ from ...utils.dto import FilterDto
 
 
 @router.post('/{id}/folder-elements/all', response_model=List[FolderDto], status_code=status.HTTP_200_OK)
-async def register(id: str, filter_dto: FilterDto):
+async def get_all(id: str, filter_dto: FilterDto):
     return FolderElementDbController.get_all_folder_elements(id, filter_dto)
 
 
-@router.post("/{id}/folder-elements/{element_id}", response_model=FolderElementDto, status_code=status.HTTP_201_CREATED)
-async def create_folder(
-        id: str, element_id: str,
-        folder_element_update_dto: FolderElementUpdateDto, response: Response):
+@router.post("/{id}/folder-elements", response_model=FolderElementDto, status_code=status.HTTP_201_CREATED)
+async def create_folder_element(
+        id: str,
+        folder_element_update_dto: FolderElementUpdateDto):
     folder_element: Union[FolderElementDto, None] = FolderElementDbController.add_folder_element(
         id, folder_element_update_dto
     )
     if folder_element:
         return folder_element
-    response.status_code = status.HTTP_404_NOT_FOUND
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Folder element can't be created")
 
 
 @router.put("/{id}/folder-elements/{element_id}", response_model=FolderElementDto, status_code=status.HTTP_200_OK)
-async def update_folder(
+async def update_folder_element(
         id: str, element_id: str,
-        folder_element_update_dto: FolderElementUpdateDto, response: Response):
+        folder_element_update_dto: FolderElementUpdateDto):
     folder_element: Union[FolderElementDto, None] = FolderElementDbController.update_folder_element(
         id, folder_element_update_dto
     )
     if folder_element:
         return folder_element
-    response.status_code = status.HTTP_404_NOT_FOUND
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Folder element can't be updated")
 
 
 @router.get("/{id}/folder-elements/{element_id}", response_model=FolderElementDto, status_code=status.HTTP_200_OK)
-async def update_folder(id: str, element_id: str, response: Response):
+async def get_folder_element(id: str, element_id: str):
     folder_element: Union[FolderElementDto, None] = FolderElementDbController.get_folder_element(id)
     if folder_element:
         return folder_element
-    response.status_code = status.HTTP_404_NOT_FOUND
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Folder element can't be returned")
 
 
 @router.delete("/{id}/folder-elements/{element_id}", status_code=status.HTTP_200_OK)
-async def update_folder(id: str, element_id: str, response: Response):
+async def delete_folder_element(id: str, element_id: str):
     return FolderElementDbController.remove_folder_element(id)
 

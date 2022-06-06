@@ -1,14 +1,13 @@
 from typing import Union, List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from starlette import status
 from starlette.responses import Response
 
 from src.database.controller.folder_db_controller import FolderDbController
+from src.database.tables import Folder
 from src.folder.dto.folder_dto import FolderDto
 from src.folder.dto.folder_update_dto import FolderUpdateDto
-from src.folder.dto.folder_with_elements_dto import FolderWithElementsDto
-from src.database.tables import User, Folder
 from src.utils.dto import FilterDto
 
 router = APIRouter(
@@ -19,7 +18,7 @@ router = APIRouter(
 
 
 @router.post('/all', response_model=List[FolderDto], status_code=status.HTTP_200_OK)
-async def register(filter_dto: FilterDto):
+async def get_all(filter_dto: FilterDto):
     folders: List[FolderDto] = FolderDbController.get_all_folders(filter_dto)
     return folders
 
@@ -29,7 +28,7 @@ async def create_folder(folder_update_dto: FolderUpdateDto, response: Response):
     folder: Union[FolderDto, None] = FolderDbController.add_folder(folder_update_dto)
     if folder:
         return folder
-    response.status_code = status.HTTP_404_NOT_FOUND
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Folder can't be created")
 
 
 @router.put("/{id}", response_model=FolderDto, status_code=status.HTTP_200_OK)
@@ -37,17 +36,17 @@ async def update_folder(id: str, folder_update_dto: FolderUpdateDto, response: R
     folder: Union[Folder, None] = FolderDbController.update_folder(id, folder_update_dto)
     if folder:
         return folder
-    response.status_code = status.HTTP_404_NOT_FOUND
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Folder can't be updated")
 
 
-@router.get("/{id}", response_model=FolderWithElementsDto, status_code=status.HTTP_200_OK)
-async def update_folder(id: str, response: Response):
-    folder: Union[FolderWithElementsDto, None] = FolderDbController.get_folder_with_elements(id)
+@router.get("/{id}", response_model=FolderDto, status_code=status.HTTP_200_OK)
+async def get_folder(id: str, response: Response):
+    folder: Union[FolderDto, None] = FolderDbController.get_folder(id)
     if folder:
         return folder
-    response.status_code = status.HTTP_404_NOT_FOUND
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Folder can't be returned")
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
-async def update_folder(id: str, response: Response):
+async def delete_folder(id: str, response: Response):
     return FolderDbController.remove_folder(id)

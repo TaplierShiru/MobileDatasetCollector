@@ -1,5 +1,5 @@
-import os
 import hashlib
+import os
 from typing import Tuple
 
 from .constants import N, P, R, SALT_LEN, PASSWORD_LEN

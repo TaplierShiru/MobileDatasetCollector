@@ -1,8 +1,8 @@
+import os
 import traceback
 
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
-import os
 
 
 def create_database(name: str, echo: bool = False) -> bool:

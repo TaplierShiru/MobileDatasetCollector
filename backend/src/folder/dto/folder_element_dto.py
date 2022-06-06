@@ -2,7 +2,7 @@ from datetime import date
 
 from pydantic import BaseModel
 
-from src.database.tables import User, Folder, FolderElement
+from src.database.tables import FolderElement
 from src.shared.dto import LabelDto
 from src.user.dto.user_dto import UserDto
 
