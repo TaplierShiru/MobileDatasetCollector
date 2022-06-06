@@ -1,14 +1,19 @@
 from typing import List, Union
 
-from fastapi import HTTPException
+from fastapi import HTTPException, APIRouter
 from starlette import status
 
-from .folder_controller import router
 from ..dto.folder_dto import FolderDto
 from ..dto.folder_element_dto import FolderElementDto
 from ..dto.folder_element_update_dto import FolderElementUpdateDto
 from ...database.controller.folder_element_db_controller import FolderElementDbController
 from ...utils.dto import FilterDto
+
+router = APIRouter(
+    prefix='/folders',
+    tags=['folder_elements'],
+    responses={404: {'description': 'Not found'}},
+)
 
 
 @router.post('/{id}/folder-elements/all', response_model=List[FolderDto], status_code=status.HTTP_200_OK)

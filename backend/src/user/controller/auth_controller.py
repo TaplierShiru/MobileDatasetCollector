@@ -2,14 +2,11 @@ from datetime import timedelta
 from typing import Union
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
 from starlette import status
 
 from src.database.controller.user_db_controller import UserDbController
-from src.user.dto import UserLoginDto, UserRegisterDto
-from src.user.dto.user_dto import UserDto
-from src.utils import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
+from src.user.dto import UserLoginDto, UserRegisterDto, UserDto, TokenDto
+from src.user.utils.auth_bearer import JWTBearer
 
 router = APIRouter(
     prefix='/auth',
@@ -17,17 +14,15 @@ router = APIRouter(
     responses={404: {'description': 'Not found'}},
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
-@router.post("/token", status_code=status.HTTP_200_OK)
+@router.post("/token", response_model=TokenDto, status_code=status.HTTP_200_OK)
 async def login(user_login_dto: UserLoginDto):
     user_dto: Union[UserDto, None] = UserDbController.login(user_login_dto.email, user_login_dto.password)
     if user_dto is None:
         # Wrong email/pass
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect username or password")
+    access_token_expires = timedelta(minutes=JWTBearer.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = JWTBearer.create_access_token(
         data={"sub": user_dto.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
@@ -37,34 +32,9 @@ async def login(user_login_dto: UserLoginDto):
 async def register(user_register_dto: UserRegisterDto):
     result = UserDbController.add_user(user_register_dto)
     if not result:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-
-
-async def _get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has been expired",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except JWTError:
-        raise credentials_exception
-    user: Union[UserDto, None] = UserDbController.get_user(email)
-    if user is None:
-        raise credentials_exception
-    return user
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect username or password")
 
 
 @router.get("/user", response_model=UserDto)
-async def get_current_user(current_user: UserDto = Depends(_get_current_user)):
+async def get_current_user(current_user: UserDto = Depends(JWTBearer())):
     return current_user

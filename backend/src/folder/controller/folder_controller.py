@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 from starlette.responses import Response
 
-from src.database.controller.folder_db_controller import FolderDbController
+from src.database.controller import FolderDbController
 from src.database.tables import Folder
 from src.folder.dto.folder_dto import FolderDto
 from src.folder.dto.folder_update_dto import FolderUpdateDto
@@ -50,3 +50,4 @@ async def get_folder(id: str, response: Response):
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_folder(id: str, response: Response):
     return FolderDbController.remove_folder(id)
+

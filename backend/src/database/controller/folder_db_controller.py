@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from src.database.controller.label_db_controller import LabelDbController
 from src.database.controller.session_controller import get_session
 from src.database.tables import Folder, Label
-from src.folder.dto.folder_dto import FolderDto
-from src.folder.dto.folder_update_dto import FolderUpdateDto
+from src.folder.dto import FolderDto
+from src.folder.dto import FolderUpdateDto
 from src.utils import log
 from src.utils.dto import FilterDto
 
