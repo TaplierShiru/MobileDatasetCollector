@@ -8,4 +8,4 @@ RUN ["pip", "install", "--no-cache-dir", "-r", "requirements.txt"]
 COPY . .
 EXPOSE 3117
 RUN ["chmod", "+x", "./wait-for-mariadb.sh"]
-CMD ["bash", "./wait-for-mariadb.sh", "db", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "3117"]
+CMD ["bash", "./wait-for-mariadb.sh", "db", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3117"]

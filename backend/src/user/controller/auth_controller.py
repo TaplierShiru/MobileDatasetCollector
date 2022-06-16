@@ -25,7 +25,7 @@ async def login(user_login_dto: UserLoginDto):
     access_token = JWTBearer.create_access_token(
         data={"sub": user_dto.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "Bearer"}
 
 
 @router.post('/register', status_code=status.HTTP_201_CREATED)

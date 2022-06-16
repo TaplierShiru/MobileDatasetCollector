@@ -1,3 +1,4 @@
+from typing import Union
 
 from pydantic import BaseModel
 
@@ -7,4 +8,4 @@ class UserRegisterDto(BaseModel):
     lastName: str
     email: str
     password: str
-    phone: str
+    phone: Union[str, None] = None
