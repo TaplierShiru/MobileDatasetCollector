@@ -1,11 +1,11 @@
 import 'package:app/auth/dtos/create_user_dto.dart';
 import 'package:app/core/utils/status_code_enum.dart';
 import 'package:app/user/view_model/user_view_model.dart';
+import 'package:app/utils/exceptions/request_exception.dart';
 import 'package:app/utils/validators/required_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/dtos/request_dto.dart';
 import '../../utils/validators/type_helpers.dart';
 import '../../utils/widgets/async_button.dart';
 
@@ -112,19 +112,26 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
               emailController.text,
               passwordController.text,
               phoneController.text);
-          RequestDto result =
-              await Provider.of<UserViewModel>(context, listen: false)
-                  .register(createUserDto);
+          try {
+            bool result =
+                await Provider.of<UserViewModel>(context, listen: false)
+                    .register(createUserDto);
 
-          if (!mounted) return false;
-          if (result.statusCode == StatusCode.success) {
+            if (!mounted) return false;
+            if (result) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Successfully registered'),
+              ));
+              Future.delayed(const Duration(seconds: 1), () {
+                Navigator.pop(context);
+              });
+              return true;
+            }
+          } on RequestException {
+            // Account is buzy (email)
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Successfully registered'),
+              content: Text('User with this email already exist'),
             ));
-            Future.delayed(const Duration(seconds: 1), () {
-              Navigator.pop(context);
-            });
-            return true;
           }
         }
         if (!mounted) return false;

@@ -15,7 +15,7 @@ FolderElementUpdateDto _$FolderElementUpdateDtoFromJson(
   return FolderElementUpdateDto(
     json['name'] as String,
     json['label'] as String,
-    json['imageFile'] as String,
+    json['imageFile'] as String?,
     UserDto.fromJson(json['lastUserChange'] as Map<String, dynamic>),
   );
 }

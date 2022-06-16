@@ -5,7 +5,7 @@ class Environment extends BaseEnvironment {
   static String apiUrl = env_local.Environment.apiUrl;
 
   static String appendToApiUrl(List<String> args) {
-    var finalString = '';
+    var finalString = Environment.apiUrl;
     for (var element in args) {
       if (element.isNotEmpty) {
         finalString += '/$element';

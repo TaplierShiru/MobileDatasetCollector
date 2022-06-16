@@ -1,7 +1,6 @@
 import 'package:app/core/routes/routes.dart';
 import 'package:app/core/utils/status_code_enum.dart';
 import 'package:app/user/view_model/user_view_model.dart';
-import 'package:app/utils/validators/required_validator.dart';
 import 'package:app/utils/widgets/async_button.dart';
 import 'package:app/utils/widgets/text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -90,7 +89,7 @@ class _LoginWidgetState extends State<LoginWidget> {
 
             return true;
           } on RequestException catch (e) {
-            if (e.requestDto.statusCode == StatusCode.unauthorized) {
+            if (e.statusCode == StatusCode.unauthorized) {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('Wrong username/email or password')));
             }

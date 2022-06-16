@@ -1,25 +1,46 @@
-import 'package:app/auth/dtos/create_user_dto.dart';
-import 'package:app/core/utils/status_code_enum.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
-import '../../core/dtos/request_dto.dart';
-import '../../user/dtos/user_dto.dart';
+import '../dtos/create_user_dto.dart';
+import '../../core/utils/status_code_enum.dart';
+import '../../environment/environment.dart';
 import '../../utils/exceptions/request_exception.dart';
+import '../dtos/token_dto.dart';
 
 class AuthService {
-  Future<UserDto> login(String email, String password) async {
-    await Future.delayed(const Duration(seconds: 4));
-
-    if (email == 'admin' && password == 'admin') {
-      var userDto = UserDto(
-          '0', 'admin', 'admin-o', "email@email.com", '+7 902 238 2444');
-      return Future<UserDto>.value(userDto);
+  Future<TokenDto> login(
+      http.Client client, String email, String password) async {
+    final response = await client.post(
+      Uri.parse(Environment.appendToApiUrl(['auth', 'token'])),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+    // status code -- created
+    if (response.statusCode ==
+        StatusCodeExtended.getCodeForStatus(StatusCode.success)) {
+      return TokenDto.fromJson(jsonDecode(response.body));
     }
 
-    throw RequestException(requestDto: RequestDto(StatusCode.unauthorized));
+    throw RequestException(statusCode: StatusCode.unauthorized);
   }
 
-  Future<RequestDto> register(CreateUserDto createUserDto) async {
-    await Future.delayed(const Duration(seconds: 4));
-    return Future<RequestDto>.value(RequestDto(StatusCode.success));
+  Future<bool> register(http.Client client, CreateUserDto createUserDto) async {
+    final response = await client.post(
+      Uri.parse(Environment.appendToApiUrl(['auth', 'register'])),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(createUserDto.toJson()),
+    );
+    // status code -- created
+    if (response.statusCode ==
+        StatusCodeExtended.getCodeForStatus(StatusCode.created)) {
+      return true;
+    }
+
+    throw RequestException(statusCode: StatusCode.badRequest);
   }
 }

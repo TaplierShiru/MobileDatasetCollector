@@ -1,6 +1,6 @@
-import '../../core/dtos/request_dto.dart';
+import '../../core/utils/status_code_enum.dart';
 
 class RequestException implements Exception {
-  late RequestDto requestDto;
-  RequestException({required this.requestDto});
+  late StatusCode statusCode;
+  RequestException({required this.statusCode});
 }

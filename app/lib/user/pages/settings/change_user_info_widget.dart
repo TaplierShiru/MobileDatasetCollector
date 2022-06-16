@@ -1,12 +1,7 @@
 import 'package:app/user/view_model/user_view_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 
-import '../../../utils/validators/required_validator.dart';
-import '../../../utils/validators/type_helpers.dart';
 import '../../../utils/widgets/async_button.dart';
 import '../../../utils/widgets/text_form_field.dart';
 

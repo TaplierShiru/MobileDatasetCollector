@@ -1,22 +1,9 @@
-import 'dart:convert';
-import 'package:app/core/routes/routes.dart';
-import 'package:app/folders/view_model/folders_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-import 'package:app/environment/environment.dart';
 import 'package:provider/provider.dart';
+
 import 'user/view_model/user_view_model.dart';
-
-Future<String> testServer(http.Client client) async {
-  final response =
-      await client.get(Uri.parse(Environment.appendToApiUrl(['auth'])));
-
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body)['message'];
-  }
-  throw Exception('Failed to test server');
-}
+import 'core/routes/routes.dart';
+import 'folders/view_model/folders_view_model.dart';
 
 // Image picker
 // https://pub.dev/packages/image_picker
