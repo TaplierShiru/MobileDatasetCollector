@@ -17,7 +17,7 @@ class UserDbController:
     def get_user(email: str) -> Union[UserDto, None]:
         try:
             with get_session() as session:
-                user = UserDbController._get_user(session, None, email)
+                user = UserDbController.get_user_with_session(session, None, email)
                 if user is None:
                     return
                 return UserDto.from_database(user)
@@ -26,10 +26,10 @@ class UserDbController:
             traceback.print_exc()
 
     @staticmethod
-    def _get_user(session: Session, id: Union[str, None], email: Union[str, None] = None) -> Union[User, None]:
+    def get_user_with_session(session: Session, id: Union[str, None], email: Union[str, None] = None) -> Union[User, None]:
         try:
             if id is None and email is None:
-                raise Exception('Id or email must be provided to `_get_user` function')
+                raise Exception('Id or email must be provided to `get_user_with_session` function')
             if email is None:
                 user: User = session.query(User).filter_by(id=id).first()
             else:
@@ -43,7 +43,7 @@ class UserDbController:
     def add_user(user_register_dto: UserRegisterDto) -> bool:
         try:
             with get_session() as session:
-                found_user = UserDbController._get_user(session, None, email=user_register_dto.email)
+                found_user = UserDbController.get_user_with_session(session, None, email=user_register_dto.email)
                 if found_user is not None:
                     log.debug(f'User already exist, input=[{user_register_dto}], existed user=[{found_user}]')
                     return False
@@ -80,7 +80,7 @@ class UserDbController:
     def login(email: str, password: str) -> Union[UserDto, None]:
         try:
             with get_session() as session:
-                user: Union[User, None] = UserDbController._get_user(session, None, email=email)
+                user: Union[User, None] = UserDbController.get_user_with_session(session, None, email=email)
                 if user is None:
                     return
                 hashbytes, _ = get_hash(password=password, salt=user.salt)
@@ -92,7 +92,7 @@ class UserDbController:
             traceback.print_exc()
 
     @staticmethod
-    def _get_user_role(user: User) -> Union[str, None]:
+    def get_user_with_session_role(user: User) -> Union[str, None]:
         try:
             with get_session() as session:
                 user: User = session.query(User).filter_by(id=user.id).first()

@@ -18,7 +18,7 @@ class FolderDbController:
     def get_folder(id: str) -> Union[FolderDto, None]:
         try:
             with get_session() as session:
-                folder: Union[Folder, None] = FolderDbController._get_folder(id, session)
+                folder: Union[Folder, None] = FolderDbController.get_folder_with_session(id, session)
                 if folder is None:
                     return
                 return FolderDto.from_database(folder)
@@ -27,7 +27,7 @@ class FolderDbController:
             traceback.print_exc()
 
     @staticmethod
-    def _get_folder(id: str, session: Session) -> Union[Folder, None]:
+    def get_folder_with_session(id: str, session: Session) -> Union[Folder, None]:
         return session.query(Folder).filter_by(id=id).first()
 
     @staticmethod
@@ -51,7 +51,7 @@ class FolderDbController:
     def update_folder(id: str, folder_update_dto: FolderUpdateDto) -> Union[FolderDto, None]:
         try:
             with get_session() as session:
-                folder: Union[Folder, None] = FolderDbController._get_folder(id, session)
+                folder: Union[Folder, None] = FolderDbController.get_folder_with_session(id, session)
                 if folder is None:
                     return
                 # Check each label
@@ -79,7 +79,7 @@ class FolderDbController:
     def remove_folder(id: str) -> bool:
         try:
             with get_session() as session:
-                folder: Folder = FolderDbController._get_folder(id, session)
+                folder: Folder = FolderDbController.get_folder_with_session(id, session)
                 if folder is None:
                     return False
                 session.delete(folder)

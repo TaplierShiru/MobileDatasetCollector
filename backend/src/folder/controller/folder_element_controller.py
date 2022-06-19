@@ -1,12 +1,14 @@
 from typing import List, Union
 
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, APIRouter, Depends
 from starlette import status
 
 from ..dto.folder_dto import FolderDto
 from ..dto.folder_element_dto import FolderElementDto
 from ..dto.folder_element_update_dto import FolderElementUpdateDto
 from ...database.controller.folder_element_db_controller import FolderElementDbController
+from ...user.dto import UserDto
+from ...user.utils.auth_bearer import JWTBearer
 from ...utils.dto import FilterDto
 
 router = APIRouter(
@@ -16,7 +18,7 @@ router = APIRouter(
 )
 
 
-@router.post('/{id}/folder-elements/all', response_model=List[FolderDto], status_code=status.HTTP_200_OK)
+@router.post('/{id}/folder-elements/all', response_model=List[FolderElementDto], status_code=status.HTTP_200_OK)
 async def get_all(id: str, filter_dto: FilterDto):
     return FolderElementDbController.get_all_folder_elements(id, filter_dto)
 
@@ -24,9 +26,10 @@ async def get_all(id: str, filter_dto: FilterDto):
 @router.post("/{id}/folder-elements", response_model=FolderElementDto, status_code=status.HTTP_201_CREATED)
 async def create_folder_element(
         id: str,
-        folder_element_update_dto: FolderElementUpdateDto):
+        folder_element_update_dto: FolderElementUpdateDto,
+        current_user: UserDto = Depends(JWTBearer())):
     folder_element: Union[FolderElementDto, None] = FolderElementDbController.add_folder_element(
-        id, folder_element_update_dto
+        id, folder_element_update_dto, current_user
     )
     if folder_element:
         return folder_element
@@ -36,9 +39,10 @@ async def create_folder_element(
 @router.put("/{id}/folder-elements/{element_id}", response_model=FolderElementDto, status_code=status.HTTP_200_OK)
 async def update_folder_element(
         id: str, element_id: str,
-        folder_element_update_dto: FolderElementUpdateDto):
+        folder_element_update_dto: FolderElementUpdateDto,
+        current_user: UserDto = Depends(JWTBearer())):
     folder_element: Union[FolderElementDto, None] = FolderElementDbController.update_folder_element(
-        id, folder_element_update_dto
+        id, folder_element_update_dto, current_user
     )
     if folder_element:
         return folder_element

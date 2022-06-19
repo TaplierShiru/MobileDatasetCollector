@@ -11,7 +11,10 @@ class Folder(Base):
     id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
     folder_name = Column(String)
 
-    folder_elements = relationship('FolderElement', cascade='all, delete-orphan', back_populates='folder')
+    folder_elements = relationship(
+        'FolderElement', cascade='all, delete-orphan',
+        lazy='dynamic', back_populates='folder',
+    )
     labels = relationship('Label', cascade='all, delete-orphan', back_populates='folder')
 
     def __init__(self, folder_name):

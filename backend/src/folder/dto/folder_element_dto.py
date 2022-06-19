@@ -19,7 +19,7 @@ class FolderElementDto(BaseModel):
     @staticmethod
     def from_database(folder_element: FolderElement):
         return FolderElementDto(
-            id=folder_element.id, name=folder_element.folder_name,
+            id=folder_element.id, name=folder_element.name,
             label=LabelDto.from_database(folder_element.label_connection.label),
             image_url=folder_element.image_path,
             date_uploaded=folder_element.date_uploaded,

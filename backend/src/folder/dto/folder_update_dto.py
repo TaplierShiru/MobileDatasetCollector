@@ -2,9 +2,9 @@ from typing import List
 
 from pydantic import BaseModel
 
-from src.shared.dto import LabelDto
+from src.shared.dto import LabelUpdateDto
 
 
 class FolderUpdateDto(BaseModel):
     name: str
-    labels: List[LabelDto]
+    labels: List[LabelUpdateDto]

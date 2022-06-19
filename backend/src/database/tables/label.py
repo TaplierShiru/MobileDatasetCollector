@@ -11,7 +11,7 @@ class Label(Base):
     id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
     label_name = Column(String)
 
-    folder_id = Column(String, ForeignKey('folders.id'), default=uuid.uuid4)
+    folder_id = Column(String, ForeignKey('folders.id'), default=lambda: uuid.uuid4().hex)
 
     folder = relationship('Folder', back_populates='labels')
     folder_element_connection = relationship('FolderElementToLabel', back_populates='label')
