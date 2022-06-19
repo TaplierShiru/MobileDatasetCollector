@@ -1,13 +1,14 @@
 import 'dart:math';
 
+import 'package:app/shared/dtos/label_dto.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 
 class CreateFolderElementController {
-  List<String> labels = [];
+  List<LabelDto> labels = [];
   List<XFile> imageFileList = [];
   List<TextEditingController> nameControllerList = [];
-  List<String> labelDropdownValueList = [];
+  List<LabelDto> labelDropdownValueList = [];
 
   int get length {
     return min(nameControllerList.length,

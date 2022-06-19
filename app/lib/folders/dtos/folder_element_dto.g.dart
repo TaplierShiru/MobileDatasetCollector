@@ -13,20 +13,20 @@ FolderElementDto _$FolderElementDtoFromJson(Map<String, dynamic> json) {
       'id',
       'name',
       'label',
-      'imageUrl',
-      'dateUploaded',
-      'dateChanged',
-      'lastUserChange'
+      'image_url',
+      'date_uploaded',
+      'date_changed',
+      'last_user_change'
     ],
   );
   return FolderElementDto(
     json['id'] as String,
     json['name'] as String,
-    json['label'] as String,
-    json['imageUrl'] as String,
-    DateTime.parse(json['dateUploaded'] as String),
-    DateTime.parse(json['dateChanged'] as String),
-    UserDto.fromJson(json['lastUserChange'] as Map<String, dynamic>),
+    LabelDto.fromJson(json['label'] as Map<String, dynamic>),
+    json['image_url'] as String,
+    DateTime.parse(json['date_uploaded'] as String),
+    DateTime.parse(json['date_changed'] as String),
+    UserDto.fromJson(json['last_user_change'] as Map<String, dynamic>),
   );
 }
 
@@ -35,8 +35,8 @@ Map<String, dynamic> _$FolderElementDtoToJson(FolderElementDto instance) =>
       'id': instance.id,
       'name': instance.name,
       'label': instance.label,
-      'imageUrl': instance.imageUrl,
-      'dateUploaded': instance.dateUploaded.toIso8601String(),
-      'dateChanged': instance.dateChanged.toIso8601String(),
-      'lastUserChange': instance.lastUserChange,
+      'image_url': instance.imageUrl,
+      'date_uploaded': instance.dateUploaded.toIso8601String(),
+      'date_changed': instance.dateChanged.toIso8601String(),
+      'last_user_change': instance.lastUserChange,
     };

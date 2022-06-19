@@ -92,13 +92,11 @@ class _CreateFolderElementWidgetState extends State<CreateFolderElementWidget> {
         });
         for (var i = 0; i < _imageFilesHolder.length; i++) {
           final folderElementUpdate = FolderElementUpdateDto(
-            _imageFilesHolder.nameControllerList[i].text,
-            _imageFilesHolder.labelDropdownValueList[i],
-            base64Encode(
-              await _imageFilesHolder.imageFileList[i].readAsBytes(),
-            ),
-            context.read<UserViewModel>().getCurrentUser!,
-          );
+              _imageFilesHolder.nameControllerList[i].text,
+              _imageFilesHolder.labelDropdownValueList[i],
+              base64Encode(
+                await _imageFilesHolder.imageFileList[i].readAsBytes(),
+              ));
 
           if (!mounted) return;
           await context
@@ -117,9 +115,8 @@ class _CreateFolderElementWidgetState extends State<CreateFolderElementWidget> {
   }
 
   Future<void> _initLabels() async {
-    final labels = await context
-        .read<FoldersViewModel>()
-        .getLabelsOfFolder(widget.folderId);
-    _imageFilesHolder.labels = labels;
+    final folderDto =
+        await context.read<FoldersViewModel>().getFolder(widget.folderId);
+    _imageFilesHolder.labels = folderDto.labels;
   }
 }

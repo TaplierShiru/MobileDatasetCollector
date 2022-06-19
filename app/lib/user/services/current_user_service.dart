@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:app/user/dtos/user_dto.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../../auth/dtos/token_dto.dart';
@@ -10,7 +11,7 @@ import '../../core/utils/status_code_enum.dart';
 import '../../environment/environment.dart';
 import '../../utils/exceptions/request_exception.dart';
 
-class CurrentUserService extends ChangeNotifier {
+class CurrentUserService extends GetxController {
   UserDto? currentUserDto;
   TokenDto? tokenDto;
 

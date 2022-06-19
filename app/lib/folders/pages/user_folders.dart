@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/routes/routes.dart';
+import '../../utils/helpers/get_proper_url.dart';
 import '../view_model/folders_view_model.dart';
 
 class UserFoldersWidget extends StatefulWidget {
@@ -139,13 +140,14 @@ class _UserFoldersWidgetState extends State<UserFoldersWidget> {
           height: 150,
           child: Hero(
             tag: 'to-single-element-index-${_folderElements[index].id}',
-            child: Image.network(_folderElements[index].imageUrl,
-                fit: BoxFit.contain),
+            child: Image.network(
+              getProperUrl(_folderElements[index].imageUrl)!,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
         Text(_folderElements[index].name),
-        Text(_folderElements[index].label),
-        Text(_folderElements[index].id),
+        Text(_folderElements[index].label.name),
       ],
     );
   }
@@ -242,6 +244,7 @@ class _UserFoldersWidgetState extends State<UserFoldersWidget> {
     final folderElements = await context
         .read<FoldersViewModel>()
         .getElementsFolder(widget.folderId, filterDto);
+    print(folderElements.length);
     _folderElements = folderElements;
   }
 }

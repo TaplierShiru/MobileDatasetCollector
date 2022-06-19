@@ -1,4 +1,5 @@
 import 'package:app/core/dtos/base_dto.dart';
+import 'package:app/shared/dtos/label_dto.dart';
 import 'package:app/user/dtos/user_dto.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -10,18 +11,18 @@ class FolderElementDto extends BaseDto {
   late String name;
 
   @JsonKey(required: true)
-  late String label;
+  late LabelDto label;
 
-  @JsonKey(required: true)
+  @JsonKey(required: true, name: 'image_url')
   late String imageUrl;
 
-  @JsonKey(required: true)
+  @JsonKey(required: true, name: 'date_uploaded')
   late DateTime dateUploaded;
 
-  @JsonKey(required: true)
+  @JsonKey(required: true, name: 'date_changed')
   late DateTime dateChanged;
 
-  @JsonKey(required: true)
+  @JsonKey(required: true, name: 'last_user_change')
   late UserDto lastUserChange;
 
   FolderElementDto(String id, this.name, this.label, this.imageUrl,

@@ -9,19 +9,21 @@ part of 'folder_dto.dart';
 FolderDto _$FolderDtoFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'folderName', 'labels', 'numberRecords'],
+    requiredKeys: const ['id', 'name', 'labels', 'number_records'],
   );
   return FolderDto(
     json['id'] as String,
-    json['folderName'] as String,
-    (json['labels'] as List<dynamic>).map((e) => e as String).toList(),
-    json['numberRecords'] as int,
+    json['name'] as String,
+    (json['labels'] as List<dynamic>)
+        .map((e) => LabelDto.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    json['number_records'] as int,
   );
 }
 
 Map<String, dynamic> _$FolderDtoToJson(FolderDto instance) => <String, dynamic>{
       'id': instance.id,
-      'folderName': instance.folderName,
+      'name': instance.folderName,
       'labels': instance.labels,
-      'numberRecords': instance.numberRecords,
+      'number_records': instance.numberRecords,
     };

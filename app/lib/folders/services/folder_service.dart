@@ -1,154 +1,113 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:app/folders/dtos/folder_dto.dart';
 import 'package:app/folders/dtos/folder_element_dto.dart';
 import 'package:app/user/dtos/user_dto.dart';
 import 'package:app/utils/helpers/filter_parameters_dto.dart';
 
+import '../../auth/services/auth_client.dart';
+import '../../core/utils/status_code_enum.dart';
+import '../../environment/environment.dart';
+import '../../utils/exceptions/request_exception.dart';
 import '../dtos/folder_element_update_dto.dart';
+import '../dtos/folder_update_dto.dart';
 
 class FolderService {
-  final List<FolderDto> _folderList = <FolderDto>[
-    FolderDto('0', 'water', ['sick', 'health', 'unknown'], 100),
-    FolderDto('1', 'ground', ['sick', 'health', 'unknown'], 253),
-    FolderDto(
-        '2', 'plant', ['sick', 'health', 'green', 'blue', 'unknown'], 634),
-    FolderDto('3', 'juice', ['fruits', 'no-fruits'], 634),
-    FolderDto('4', 'kale',
-        ['sick', 'health', 'awdaw', 'dawd', 'dawdaw', 'adw2'], 236),
-    FolderDto('5', 'mua', ['sick', 'health', 'dawda'], 327),
-    FolderDto('6', 'oar', ['sick', 'health', 'adwdaw'], 431),
-    FolderDto('7', 'rpar', ['daw', 'health', 'dawdawda'], 146),
-    FolderDto(
-        '8',
-        'xac',
-        [
-          'dawdaw',
-          'health',
-          'dawda',
-          'dawd',
-          'awd',
-          'awd231aw',
-          'awda213w',
-          'aw2daw',
-          'aw3daw',
-          'aw2daw'
-        ],
-        234),
-    FolderDto('9', 'qwrt', ['dawd', 'health', 'unknown'], 534),
-    FolderDto(
-        '10',
-        'qar',
-        [
-          'dawdaw',
-          'daw',
-          'wadaw',
-          'zzzada',
-          'cawdvaw',
-          'dvawdv',
-          'wavdwav',
-          'awawdvadaw',
-          'awvdawvd',
-          'awdawvdaw',
-          'awdadvaww',
-          'advwd',
-          'vdaw',
-          'avwdavw',
-          'dvawvd'
-        ],
-        634),
-    FolderDto('11', 'adw',
-        ['sick', 'awdawd', 'dawda', 'wva', 'daw', 'v', '2', 'awdaw'], 123),
-    FolderDto('12', 'dqwdq', ['sick', 'wdawd', 'dawd'], 534),
-    FolderDto(
-        '13',
-        'dqwdq',
-        ['sick', 'wdawd', 'awd', 'zadaw', 'vawdaw', '1231', '2312', '213123'],
-        485),
-    FolderDto('14', 'qwdqw', ['12312', 'wdawd', 'aw'], 412),
-    FolderDto('15', 'qdwdq',
-        ['daw', 'adawd', 'awdadwa', 'avwd', 'vaw', 'dvawv', 'vawdv'], 134),
-    FolderDto('16', 'dqwdq', ['dawdaw', 'health', 'awda'], 654),
-    FolderDto('17', 'qwdq', ['dawdaw', 'dawdaw', '2313'], 345),
-    FolderDto('18', 'dqwdqw', ['dawdaw', 'healdawdawth', 'unknown'], 234),
-  ];
-
   final _imgUrl =
       'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg';
 
-  final Map<String, List<FolderElementDto>> _id2folderElements = {
-    '0': [
-      for (int i = 0; i < 100; i++)
-        FolderElementDto(
-          '$i',
-          'QWE',
-          'sick',
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg',
-          DateTime.now(),
-          DateTime.now(),
-          UserDto('0', 'nick', 'name', 'email@mcom', '+7 902 239 232'),
-        ),
-    ]
-  };
-
   Future<List<FolderDto>> getFolders(
-      FilterParametersDto filterParametersDto) async {
-    await Future<void>.delayed(const Duration(seconds: 2));
+      AuthClient client, FilterParametersDto filterParametersDto) async {
+    final response = await client.post(
+      Uri.parse(Environment.appendToApiUrl(['folders', 'all'])),
+      body: jsonEncode(filterParametersDto.toJson()),
+    );
 
-    return Future<List<FolderDto>>.value(_folderList);
-  }
-
-  Future<List<FolderElementDto>> getElementsFolder(
-      String id, FilterParametersDto filterParametersDto) async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-
-    if (!_id2folderElements.containsKey(id)) {
-      _id2folderElements[id] = [];
+    if (response.statusCode ==
+        StatusCodeExtended.getCodeForStatus(StatusCode.success)) {
+      return [
+        for (final element in jsonDecode(response.body))
+          FolderDto.fromJson(element)
+      ];
     }
 
-    return Future<List<FolderElementDto>>.value(_id2folderElements[id]);
+    throw RequestException(statusCode: StatusCode.badRequest);
+  }
+
+  Future<FolderDto> getFolder(AuthClient client, String id) async {
+    final response = await client.get(
+      Uri.parse(Environment.appendToApiUrl(['folders', id])),
+    );
+
+    if (response.statusCode ==
+        StatusCodeExtended.getCodeForStatus(StatusCode.success)) {
+      return FolderDto.fromJson(jsonDecode(response.body));
+    }
+
+    throw RequestException(statusCode: StatusCode.badRequest);
+  }
+
+  Future<FolderDto> createFolder(
+      AuthClient client, FolderUpdateDto folderDto) async {
+    final response = await client.post(
+      Uri.parse(Environment.appendToApiUrl(['folders'])),
+      body: jsonEncode(folderDto.toJson()),
+    );
+
+    if (response.statusCode ==
+        StatusCodeExtended.getCodeForStatus(StatusCode.created)) {
+      return FolderDto.fromJson(jsonDecode(response.body));
+    }
+
+    throw RequestException(statusCode: StatusCode.badRequest);
+  }
+
+  Future<List<FolderElementDto>> getElementsFolder(AuthClient client,
+      String parentId, FilterParametersDto filterParametersDto) async {
+    final response = await client.post(
+      Uri.parse(Environment.appendToApiUrl(
+          ['folders', parentId, 'folder-elements', 'all'])),
+      body: jsonEncode(filterParametersDto.toJson()),
+    );
+
+    if (response.statusCode ==
+        StatusCodeExtended.getCodeForStatus(StatusCode.success)) {
+      return [
+        for (final element in jsonDecode(response.body))
+          FolderElementDto.fromJson(element)
+      ];
+    }
+
+    throw RequestException(statusCode: StatusCode.badRequest);
+  }
+
+  Future<FolderElementDto> createFolderElement(AuthClient client,
+      String parentId, FolderElementUpdateDto folderElementUpdateDto) async {
+    final response = await client.post(
+      Uri.parse(
+          Environment.appendToApiUrl(['folders', parentId, 'folder-elements'])),
+      body: jsonEncode(folderElementUpdateDto.toJson()),
+    );
+
+    if (response.statusCode ==
+        StatusCodeExtended.getCodeForStatus(StatusCode.created)) {
+      return FolderElementDto.fromJson(jsonDecode(response.body));
+    }
+
+    throw RequestException(statusCode: StatusCode.badRequest);
   }
 
   Future<FolderElementDto> getElementFolder(String parentId, String id) async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-
-    return Future<FolderElementDto>.value(_id2folderElements[parentId]!
-        .firstWhere((element) => element.id == id));
+    throw RequestException(statusCode: StatusCode.badRequest);
   }
 
   Future<List<String>> getLabelsOfFolder(String id) async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-    return _folderList.firstWhere((element) => element.id == id).labels;
-  }
-
-  Future<void> createFolder(FolderDto folderDto) async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-    final newFolderDto = FolderDto((_folderList.length + 10).toString(),
-        folderDto.folderName, folderDto.labels, 66);
-    _folderList.add(newFolderDto);
-  }
-
-  Future<void> createFolderElement(
-      String parentId, FolderElementUpdateDto folderElementUpdateDto) async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-    if (!_id2folderElements.containsKey(parentId)) {
-      _id2folderElements[parentId] = [];
-    }
-    final newFolderElementDto = FolderElementDto(
-      (_id2folderElements[parentId]!.length + 10).toString(),
-      folderElementUpdateDto.name,
-      folderElementUpdateDto.label,
-      'https://www.acboatrentals.com/wp-content/uploads/2021/09/new.png',
-      DateTime.now(),
-      DateTime.now(),
-      folderElementUpdateDto.lastUserChange,
-    );
-    _id2folderElements[parentId]!.add(newFolderElementDto);
+    throw RequestException(statusCode: StatusCode.badRequest);
   }
 
   Future<void> deleteFolderElement(
       String parentId, FolderElementDto folderElementDto) async {
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-
-    _id2folderElements[parentId]!
-        .removeWhere((element) => element.id == folderElementDto.id);
+    throw RequestException(statusCode: StatusCode.badRequest);
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app/folders/widgets/preview_image.dart';
+import 'package:app/shared/dtos/label_dto.dart';
 import 'package:app/utils/validators/required_validator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -179,7 +180,8 @@ class _UploadImagesForElementWidgetState
           Column(
             children: [
               SizedBox(
-                height: 200,
+                height: 80,
+                width: 200,
                 child: TextFormFieldWidget(
                   controller: widget.imageFilesHolder.nameControllerList[index],
                   labelText: 'Name',
@@ -211,7 +213,7 @@ class _UploadImagesForElementWidgetState
   }
 
   Widget dropdownLabelsWithIndexButton(int index) {
-    return DropdownButton<String>(
+    return DropdownButton<LabelDto>(
       value: widget.imageFilesHolder.labelDropdownValueList[index],
       icon: const Icon(Icons.arrow_downward),
       elevation: 16,
@@ -220,14 +222,14 @@ class _UploadImagesForElementWidgetState
         height: 2,
         color: Colors.deepOrangeAccent,
       ),
-      onChanged: (String? newValue) {
+      onChanged: (LabelDto? newValue) {
         setState(() {
           widget.imageFilesHolder.labelDropdownValueList[index] = newValue!;
         });
       },
       items: widget.imageFilesHolder.labels
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem(value: value, child: Text(value));
+          .map<DropdownMenuItem<LabelDto>>((LabelDto value) {
+        return DropdownMenuItem(value: value, child: Text(value.name));
       }).toList(),
     );
   }

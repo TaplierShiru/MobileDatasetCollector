@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:app/folders/dtos/folder_element_dto.dart';
 import 'package:app/folders/view_model/folders_view_model.dart';
+import 'package:app/shared/dtos/label_dto.dart';
 import 'package:app/utils/validators/required_validator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class SingleFolderElementWidget extends StatefulWidget {
 
 class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
   late FolderElementDto _folderElementDto;
-  late String _selectedLabel;
+  late LabelDto _selectedLabel;
   XFile? _newImageFile;
   dynamic _pickImageError;
   String? _retrieveDataError;
@@ -38,7 +39,7 @@ class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
 
   final _nameController = TextEditingController();
 
-  late List<String> _labels;
+  late List<LabelDto> _labels;
   late Future<void> _initData;
 
   @override
@@ -193,11 +194,7 @@ class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
               )
             : null;
         final updateDto = FolderElementUpdateDto(
-          _nameController.text,
-          _selectedLabel,
-          imageFile,
-          _folderElementDto.lastUserChange,
-        );
+            _nameController.text, _selectedLabel, imageFile);
         await _refresh();
       },
       child: const Icon(Icons.update),
@@ -227,7 +224,7 @@ class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
   Widget _dropdownLabelsButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: DropdownButton<String>(
+      child: DropdownButton<LabelDto>(
         value: _selectedLabel,
         icon: const Icon(Icons.arrow_downward),
         elevation: 16,
@@ -237,13 +234,13 @@ class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
           height: 2,
           color: Colors.deepOrangeAccent,
         ),
-        onChanged: (String? newValue) {
+        onChanged: (LabelDto? newValue) {
           setState(() {
             _selectedLabel = newValue!;
           });
         },
-        items: _labels.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem(value: value, child: Text(value));
+        items: _labels.map<DropdownMenuItem<LabelDto>>((LabelDto value) {
+          return DropdownMenuItem(value: value, child: Text(value.name));
         }).toList(),
       ),
     );
@@ -291,9 +288,8 @@ class _SingleFolderElementWidgetState extends State<SingleFolderElementWidget> {
   }
 
   Future<void> _initLabels() async {
-    final labels = await context
-        .read<FoldersViewModel>()
-        .getLabelsOfFolder(widget.folderId);
-    _labels = labels;
+    final folderDto =
+        await context.read<FoldersViewModel>().getFolder(widget.folderId);
+    _labels = folderDto.labels;
   }
 }

@@ -1,11 +1,14 @@
 import 'package:app/folders/dtos/folder_dto.dart';
 import 'package:app/folders/view_model/folders_view_model.dart';
+import 'package:app/utils/exceptions/request_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../shared/dtos/label_update_dto.dart';
 import '../../utils/validators/required_validator.dart';
 import '../../utils/validators/type_helpers.dart';
 import '../../utils/widgets/async_button.dart';
+import '../dtos/folder_update_dto.dart';
 
 class CreateFolderWidget extends StatefulWidget {
   const CreateFolderWidget({Key? key}) : super(key: key);
@@ -124,18 +127,29 @@ class _CreateFolderWidgetState extends State<CreateFolderWidget> {
     return AsyncButton(
       onAsyncCall: () async {
         if (_formKey.currentState!.validate()) {
-          final createFolderDto =
-              FolderDto('0', _nameFolderControl.text, _labels, 0);
-          await context.read<FoldersViewModel>().createFolder(createFolderDto);
+          final createFolderDto = FolderUpdateDto(
+            _nameFolderControl.text,
+            _labels.map((e) => LabelUpdateDto(e)).toList(),
+          );
+          try {
+            await context
+                .read<FoldersViewModel>()
+                .createFolder(createFolderDto);
 
-          if (!mounted) return false;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Successfully saved'),
-          ));
-          Future.delayed(const Duration(seconds: 1), () {
-            Navigator.pop(context);
-          });
-          return true;
+            if (!mounted) return false;
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Successfully saved'),
+            ));
+            Future.delayed(const Duration(seconds: 1), () {
+              Navigator.pop(context);
+            });
+            return true;
+          } on RequestException {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Something went wrong...'),
+            ));
+          }
+          return false;
         }
 
         if (!mounted) return false;
